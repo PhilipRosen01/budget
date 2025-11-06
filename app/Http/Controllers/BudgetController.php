@@ -148,36 +148,6 @@ class BudgetController extends Controller
         
         $monthName = Carbon::create($year, $month, 1)->format('F Y');
 
-        // Store deletion parameters in session for background processing
-        session([
-            'pending_deletion' => [
-                'month' => $month,
-                'year' => $year,
-                'month_name' => $monthName
-            ]
-        ]);
-
-        // Redirect to setup page immediately - this ensures user sees the fresh dashboard
-        $now = Carbon::now();
-        return redirect()->route('budgets.setup', [
-            'month' => $now->month,
-            'year' => $now->year
-        ])->with('info', "Redirecting to budget setup. Deleting {$monthName} budgets...");
-    }
-    
-    public function completeDeletion(Request $request)
-    {
-        $pendingDeletion = session('pending_deletion');
-        
-        if (!$pendingDeletion) {
-            return redirect()->route('dashboard')->with('error', 'No pending deletion found.');
-        }
-        
-        $user = Auth::user();
-        $month = $pendingDeletion['month'];
-        $year = $pendingDeletion['year'];
-        $monthName = $pendingDeletion['month_name'];
-
         // Delete all budgets for this month
         $deletedCount = $user->budgets()
             ->where('month', $month)
@@ -190,16 +160,21 @@ class BudgetController extends Controller
             ->whereYear('purchase_date', $year)
             ->delete();
 
-        // Clear the pending deletion from session
-        session()->forget('pending_deletion');
+        // Set session flag to prevent auto-generation on dashboard
+        session(['just_deleted' => true]);
         
-        if ($deletedCount > 0) {
-            $message = "Successfully deleted all budgets for {$monthName} ({$deletedCount} budgets removed).";
-            return redirect()->route('dashboard')->with('success', $message);
-        } else {
-            return redirect()->route('dashboard')->with('info', "No budgets found for {$monthName}.");
-        }
+        // Redirect to setup page for current month with success message
+        $now = Carbon::now();
+        $message = $deletedCount > 0 
+            ? "Deleted all budgets for {$monthName} ({$deletedCount} budgets removed). Set up your new budget below."
+            : "No budgets found for {$monthName}. Set up your budget below.";
+            
+        return redirect()->route('budgets.setup', [
+            'month' => $now->month,
+            'year' => $now->year
+        ])->with('success', $message);
     }
+
 
     private function getAvailableMonths()
     {

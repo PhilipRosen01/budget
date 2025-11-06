@@ -327,29 +327,5 @@
             // Initial calculation
             updateBudgetCalculations();
         });
-
-        // Check if there's a pending deletion to complete
-        @if(session('pending_deletion'))
-        // Automatically complete the deletion after page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                // Create a form to complete the deletion
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("budgets.complete-deletion") }}';
-                form.style.display = 'none';
-                
-                // Add CSRF token
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = '{{ csrf_token() }}';
-                form.appendChild(csrfInput);
-                
-                document.body.appendChild(form);
-                form.submit();
-            }, 1000); // Wait 1 second to let user see the setup page
-        });
-        @endif
     </script>
 </x-app-layout>

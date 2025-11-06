@@ -31,8 +31,6 @@ Route::middleware('auth')->group(function () {
     // Custom budget routes (must come BEFORE resource routes to avoid conflicts)
     Route::delete('/budgets/month', [BudgetController::class, 'destroyMonth'])
         ->name('budgets.destroy-month');
-    Route::post('/budgets/complete-deletion', [BudgetController::class, 'completeDeletion'])
-        ->name('budgets.complete-deletion');
     Route::post('/budgets/create-from-templates', [BudgetController::class, 'createFromTemplates'])
         ->name('budgets.create-from-templates');
     Route::get('/budgets/select-templates', [BudgetController::class, 'selectTemplates'])
