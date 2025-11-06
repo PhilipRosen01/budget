@@ -6,16 +6,60 @@ use App\Models\Purchase;
 use App\Models\Budget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class PurchaseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $purchases = Auth::user()->purchases()->with('budget')->latest()->get();
-        return view('purchases.index', compact('purchases'));
+        $user = Auth::user();
+        $query = $user->purchases()->with('budget');
+        
+        // Month and year filtering
+        $selectedMonth = $request->get('month', now()->month);
+        $selectedYear = $request->get('year', now()->year);
+        
+        if ($selectedMonth && $selectedYear) {
+            $query->whereMonth('purchase_date', $selectedMonth)
+                  ->whereYear('purchase_date', $selectedYear);
+        }
+        
+        // Sorting
+        $sortBy = $request->get('sort', 'purchase_date');
+        $sortDirection = $request->get('direction', 'desc');
+        
+        $allowedSorts = ['purchase_date', 'amount', 'name', 'category'];
+        if (in_array($sortBy, $allowedSorts)) {
+            if ($sortBy === 'purchase_date') {
+                $query->orderBy('purchase_date', $sortDirection);
+            } else {
+                $query->orderBy($sortBy, $sortDirection);
+            }
+        } else {
+            $query->latest('purchase_date');
+        }
+        
+        $purchases = $query->get();
+        
+        // Get available months for dropdown (SQLite compatible)
+        $availableMonths = $user->purchases()
+            ->selectRaw("DISTINCT strftime('%m', purchase_date) as month, strftime('%Y', purchase_date) as year")
+            ->whereNotNull('purchase_date')
+            ->orderByDesc('year')
+            ->orderByDesc('month')
+            ->get()
+            ->map(function ($purchase) {
+                return [
+                    'month' => (int)$purchase->month,
+                    'year' => (int)$purchase->year,
+                    'display' => Carbon::create($purchase->year, $purchase->month, 1)->format('F Y'),
+                ];
+            });
+        
+        return view('purchases.index', compact('purchases', 'availableMonths', 'selectedMonth', 'selectedYear', 'sortBy', 'sortDirection'));
     }
 
     /**
