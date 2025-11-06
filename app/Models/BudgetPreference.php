@@ -31,6 +31,8 @@ class BudgetPreference extends Model
         'personal_percentage',
         'utilities_percentage',
         'miscellaneous_percentage',
+        'monthly_investment_amount',
+        'auto_invest_enabled',
     ];
 
     protected $casts = [
@@ -53,6 +55,8 @@ class BudgetPreference extends Model
         'personal_percentage' => 'decimal:2',
         'utilities_percentage' => 'decimal:2',
         'miscellaneous_percentage' => 'decimal:2',
+        'monthly_investment_amount' => 'decimal:2',
+        'auto_invest_enabled' => 'boolean',
     ];
 
     /**
@@ -143,12 +147,17 @@ class BudgetPreference extends Model
      */
     public function generateBudgetTemplates(float $monthlySalary): array
     {
+        // Calculate available budget after investment allocation
+        $investmentAmount = $this->auto_invest_enabled ? (float) $this->monthly_investment_amount : 0;
+        $availableBudget = $monthlySalary - $investmentAmount;
+        
         $percentages = $this->getAdjustedPercentages();
         $templates = [];
 
+        // Generate regular budget templates based on available budget (after investment)
         foreach ($percentages as $category => $percentage) {
             if ($percentage > 0) {
-                $amount = ($monthlySalary * $percentage) / 100;
+                $amount = ($availableBudget * $percentage) / 100;
                 $templates[] = [
                     'name' => ucfirst($category),
                     'category' => $category,
@@ -159,6 +168,23 @@ class BudgetPreference extends Model
         }
 
         return $templates;
+    }
+
+    /**
+     * Get investment allocation details.
+     */
+    public function getInvestmentAllocation(): ?array
+    {
+        if (!$this->auto_invest_enabled || $this->monthly_investment_amount <= 0) {
+            return null;
+        }
+
+        return [
+            'name' => 'Investments',
+            'category' => 'investments',
+            'amount' => (float) $this->monthly_investment_amount,
+            'description' => 'Automatic monthly investment allocation for long-term wealth building',
+        ];
     }
 
     /**
@@ -176,6 +202,7 @@ class BudgetPreference extends Model
             'personal' => 'Entertainment, hobbies, personal care, gym membership',
             'utilities' => 'Phone bill, internet, streaming services',
             'miscellaneous' => 'Clothing, unexpected expenses, miscellaneous purchases',
+            'investments' => 'Automatic monthly investment allocation for long-term wealth building',
         ];
 
         return $descriptions[$category] ?? 'Budget category';

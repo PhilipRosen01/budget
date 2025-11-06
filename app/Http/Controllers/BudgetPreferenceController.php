@@ -36,6 +36,8 @@ class BudgetPreferenceController extends Controller
             'personal_percentage' => 'nullable|numeric|min:0|max:100',
             'utilities_percentage' => 'nullable|numeric|min:0|max:100',
             'miscellaneous_percentage' => 'nullable|numeric|min:0|max:100',
+            'monthly_investment_amount' => 'nullable|numeric|min:0|max:99999.99',
+            'auto_invest_enabled' => 'boolean',
         ]);
 
         $user = Auth::user();
@@ -54,7 +56,8 @@ class BudgetPreferenceController extends Controller
             'no_maintenance', 'no_subscriptions', 'housing_percentage',
             'transportation_percentage', 'food_percentage', 'savings_percentage',
             'insurance_percentage', 'debt_percentage', 'personal_percentage',
-            'utilities_percentage', 'miscellaneous_percentage'
+            'utilities_percentage', 'miscellaneous_percentage',
+            'monthly_investment_amount', 'auto_invest_enabled'
         ]);
 
         // Convert null strings to actual null values for percentage fields
@@ -62,6 +65,16 @@ class BudgetPreferenceController extends Controller
             if (str_ends_with($key, '_percentage') && $value === '') {
                 $preferencesData[$key] = null;
             }
+        }
+
+        // Ensure monthly_investment_amount has a default value if not provided
+        if (!isset($preferencesData['monthly_investment_amount']) || $preferencesData['monthly_investment_amount'] === '' || $preferencesData['monthly_investment_amount'] === null) {
+            $preferencesData['monthly_investment_amount'] = 1000.00;
+        }
+
+        // Ensure auto_invest_enabled is set (checkbox field might not be sent if unchecked)
+        if (!isset($preferencesData['auto_invest_enabled'])) {
+            $preferencesData['auto_invest_enabled'] = false;
         }
 
         $preferences->update($preferencesData);
@@ -103,6 +116,21 @@ class BudgetPreferenceController extends Controller
                     'is_automatic' => true, // Flag to identify auto-generated templates
                 ]);
                 $createdTemplates[] = $createdTemplate;
+            }
+
+            // Create investment template separately if enabled
+            $preferences = $user->getOrCreateBudgetPreferences();
+            $investmentAllocation = $preferences->getInvestmentAllocation();
+            if ($investmentAllocation) {
+                $investmentTemplate = $user->budgetTemplates()->create([
+                    'name' => $investmentAllocation['name'],
+                    'category' => $investmentAllocation['category'],
+                    'amount' => $investmentAllocation['amount'],
+                    'description' => $investmentAllocation['description'],
+                    'is_active' => true,
+                    'is_automatic' => true,
+                ]);
+                $createdTemplates[] = $investmentTemplate;
             }
 
             DB::commit();

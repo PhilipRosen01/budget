@@ -44,7 +44,7 @@ class BudgetTemplate extends Model
 
     public function createMonthlyBudget(int $month, int $year): Budget
     {
-        return $this->budgets()->create([
+        $budget = $this->budgets()->create([
             'user_id' => $this->user_id,
             'name' => $this->name,
             'amount' => $this->amount,
@@ -54,5 +54,19 @@ class BudgetTemplate extends Model
             'year' => $year,
             'is_active' => true,
         ]);
+
+        // For investment budgets, automatically create a purchase to represent the investment allocation
+        if ($this->category === 'investments') {
+            $budget->purchases()->create([
+                'user_id' => $this->user_id,
+                'name' => 'Investment Allocation $' . number_format($this->amount, 0),
+                'amount' => $this->amount,
+                'purchase_date' => now()->startOfMonth()->addDays(0), // First day of the month
+                'category' => 'investments',
+                'notes' => 'Automatic monthly investment allocation - funds allocated to investment accounts',
+            ]);
+        }
+
+        return $budget;
     }
 }

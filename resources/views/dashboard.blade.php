@@ -10,21 +10,39 @@
                 @endif
             </div>
             
-            <!-- Month Selector -->
-            @if($availableMonths->count() > 0)
-                <div class="flex items-center space-x-2">
-                    <label for="month-selector" class="text-sm font-medium text-gray-700">View Month:</label>
-                    <form method="GET" action="{{ route('dashboard') }}" class="inline">
-                        <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            @foreach($availableMonths as $month)
-                                <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
-                                    {{ $month['display'] }}
-                                </option>
-                            @endforeach
-                        </select>
+            <!-- Month Selector and Actions -->
+            <div class="flex items-center space-x-4">
+                @if($availableMonths->count() > 0)
+                    <div class="flex items-center space-x-2">
+                        <label for="month-selector" class="text-sm font-medium text-gray-700">View Month:</label>
+                        <form method="GET" action="{{ route('dashboard') }}" class="inline">
+                            <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                @foreach($availableMonths as $month)
+                                    <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
+                                        {{ $month['display'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
+                @endif
+                
+                <!-- Delete Month Budget Button -->
+                @if($monthBudgets->count() > 0)
+                    <form method="POST" action="{{ route('budgets.destroy-month') }}" class="inline" onsubmit="return confirm('Are you sure you want to delete ALL budgets and purchases for {{ $selectedMonth }}? This cannot be undone.')">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="month" value="{{ explode('-', $selectedValue)[0] }}">
+                        <input type="hidden" name="year" value="{{ explode('-', $selectedValue)[1] }}">
+                        <button type="submit" class="inline-flex items-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Month
+                        </button>
                     </form>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
     </x-slot>
 
@@ -44,8 +62,9 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Monthly Budget</dt>
-                                    <dd class="text-lg font-medium text-gray-900">${{ number_format($budgetStats['total_budget'], 2) }}</dd>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Available Budget</dt>
+                                    <dd class="text-lg font-medium text-gray-900">${{ number_format($budgetStats['available_budget'], 2) }}</dd>
+                                    <dd class="text-xs text-gray-400">Salary: ${{ number_format($budgetStats['total_salary'], 2) }} - Investment: ${{ number_format($budgetStats['investment_amount'], 2) }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -88,6 +107,26 @@
                                     <dd class="text-lg font-medium {{ $budgetStats['remaining'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
                                         ${{ number_format($budgetStats['remaining'], 2) }}
                                     </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow-lg rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Used</dt>
+                                    <dd class="text-lg font-medium text-gray-900">{{ number_format($budgetStats['percentage_used'], 1) }}%</dd>
                                 </dl>
                             </div>
                         </div>
@@ -253,8 +292,8 @@
                 </div>
             </div>
 
-            <!-- Current Month Budgets and Recent Purchases -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Current Month Budgets -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
@@ -283,7 +322,7 @@
                             </div>
                         @else
                             <div class="text-center py-4">
-                                <p class="text-gray-500 mb-2">No budgets for {{ $currentMonth }}</p>
+                                <p class="text-gray-500 mb-2">No budgets for {{ $selectedMonth }}</p>
                                 <a href="{{ route('budget-templates.create') }}" class="text-blue-600 hover:text-blue-900 text-sm">Create Budget Template</a>
                             </div>
                         @endif
@@ -316,6 +355,55 @@
                             </div>
                         @else
                             <p class="text-gray-500">No purchases yet. <a href="{{ route('purchases.create') }}" class="text-blue-600 hover:text-blue-900">Add your first purchase</a></p>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Purchase Goals & Rewards -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Goals & Rewards</h3>
+                            <a href="{{ route('purchase-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-900">View All</a>
+                        </div>
+                        @if($purchaseGoals->count() > 0)
+                            <div class="space-y-4">
+                                @foreach($purchaseGoals as $goal)
+                                <div class="border-l-4 border-{{ $goal->is_completed ? 'green' : 'purple' }}-400 pl-4">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <h4 class="text-sm font-medium text-gray-900">{{ $goal->name }}</h4>
+                                            <p class="text-xs text-gray-500 mb-2">
+                                                Priority {{ $goal->priority }} • 
+                                                ${{ number_format($goal->current_amount, 0) }} / ${{ number_format($goal->target_amount, 0) }}
+                                            </p>
+                                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                                <div class="bg-{{ $goal->is_completed ? 'green' : 'purple' }}-600 h-1.5 rounded-full" 
+                                                     style="width: {{ $goal->progress_percentage }}%"></div>
+                                            </div>
+                                        </div>
+                                        @if($goal->is_completed)
+                                            <span class="text-xs text-green-600 font-medium ml-2">✓ Done</span>
+                                        @else
+                                            <span class="text-xs text-purple-600 font-medium ml-2">{{ number_format($goal->progress_percentage, 0) }}%</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            <div class="mt-4">
+                                <a href="{{ route('purchase-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-900">Manage all goals →</a>
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <div class="text-gray-400 mb-2">
+                                    <svg class="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-2">No purchase goals yet</p>
+                                <a href="{{ route('purchase-goals.create') }}" class="text-blue-600 hover:text-blue-900 text-sm">Create your first goal</a>
+                            </div>
                         @endif
                     </div>
                 </div>

@@ -130,6 +130,41 @@ class BudgetController extends Controller
         return redirect()->route('budgets.index')->with('success', 'Budget deleted successfully!');
     }
 
+    /**
+     * Delete all budgets for a specific month and year
+     */
+    public function destroyMonth(Request $request)
+    {
+        $validated = $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $user = Auth::user();
+        $month = $validated['month'];
+        $year = $validated['year'];
+
+        // Delete all budgets for this month
+        $deletedCount = $user->budgets()
+            ->where('month', $month)
+            ->where('year', $year)
+            ->delete();
+
+        // Also delete all purchases for this month (they'll be orphaned otherwise)
+        $user->purchases()
+            ->whereMonth('purchase_date', $month)
+            ->whereYear('purchase_date', $year)
+            ->delete();
+
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        
+        if ($deletedCount > 0) {
+            return redirect()->route('dashboard')->with('success', "Deleted all budgets for {$monthName} ({$deletedCount} budgets removed).");
+        } else {
+            return redirect()->route('dashboard')->with('info', "No budgets found for {$monthName}.");
+        }
+    }
+
     private function getAvailableMonths()
     {
         // Get months that have budgets for the current user

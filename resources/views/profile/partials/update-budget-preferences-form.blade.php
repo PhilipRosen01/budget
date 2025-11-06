@@ -78,6 +78,52 @@
             </div>
         </div>
 
+        <!-- Investment Settings -->
+        <div class="border-t pt-6">
+            <h3 class="text-base font-medium text-gray-900 mb-3">Automatic Investment</h3>
+            <p class="text-sm text-gray-600 mb-4">Set up automatic monthly investments to build long-term wealth.</p>
+            
+            <div class="space-y-4">
+                <!-- Enable Auto Investment -->
+                <div class="flex items-center">
+                    <input 
+                        id="auto_invest_enabled" 
+                        name="auto_invest_enabled" 
+                        type="checkbox" 
+                        value="1"
+                        @checked(old('auto_invest_enabled', $preferences->auto_invest_enabled ?? true))
+                        class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                    >
+                    <label for="auto_invest_enabled" class="ml-2 block text-sm text-gray-900">
+                        Enable automatic monthly investment
+                    </label>
+                </div>
+
+                <!-- Investment Amount -->
+                <div>
+                    <x-input-label for="monthly_investment_amount" :value="__('Monthly Investment Amount')" />
+                    <div class="relative mt-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <x-text-input 
+                            id="monthly_investment_amount" 
+                            name="monthly_investment_amount" 
+                            type="number" 
+                            step="0.01"
+                            min="0"
+                            max="99999.99"
+                            class="pl-7" 
+                            :value="old('monthly_investment_amount', $preferences->monthly_investment_amount ?? 1000.00)" 
+                            placeholder="1000.00"
+                        />
+                    </div>
+                    <p class="mt-1 text-xs text-gray-600">This amount will be automatically allocated to investments each month and marked as spent.</p>
+                    <x-input-error class="mt-2" :messages="$errors->get('monthly_investment_amount')" />
+                </div>
+            </div>
+        </div>
+
         <!-- Custom Percentages (Advanced) -->
         <div class="border-t pt-6">
             <div class="flex items-center justify-between">

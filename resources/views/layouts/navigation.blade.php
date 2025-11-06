@@ -24,6 +24,9 @@
                     <x-nav-link :href="route('purchases.index')" :active="request()->routeIs('purchases.*')">
                         {{ __('Purchases') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('purchase-goals.index')" :active="request()->routeIs('purchase-goals.*')">
+                        {{ __('Goals & Rewards') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -87,6 +90,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('purchases.index')" :active="request()->routeIs('purchases.*')">
                 {{ __('Purchases') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('purchase-goals.index')" :active="request()->routeIs('purchase-goals.*')">
+                {{ __('Goals & Rewards') }}
             </x-responsive-nav-link>
         </div>
 

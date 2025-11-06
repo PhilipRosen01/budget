@@ -6,6 +6,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetTemplateController;
 use App\Http\Controllers\BudgetPreferenceController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseGoalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
     
     // Monthly budget management routes
     Route::resource('budgets', BudgetController::class);
+    Route::delete('/budgets/month', [BudgetController::class, 'destroyMonth'])
+        ->name('budgets.destroy-month');
     
     // Purchase management routes
     Route::resource('purchases', PurchaseController::class);
@@ -40,6 +43,9 @@ Route::middleware('auth')->group(function () {
         ->name('budget-preferences.generate-templates');
     Route::get('/budget-preferences/preview-templates', [BudgetPreferenceController::class, 'previewTemplates'])
         ->name('budget-preferences.preview-templates');
+    
+    // Purchase goals (rewards) management routes
+    Route::resource('purchase-goals', PurchaseGoalController::class);
 });
 
 require __DIR__.'/auth.php';

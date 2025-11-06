@@ -51,23 +51,43 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
         
-        // Calculate total monthly budget and spending
-        $totalMonthlyBudget = $monthBudgets->sum('amount');
+        // Separate investment and regular budgets
+        $investmentBudgets = $monthBudgets->where('category', 'investments');
+        $regularBudgets = $monthBudgets->where('category', '!=', 'investments');
         
-        // Calculate selected month's spending
+        // Calculate totals - get actual salary and investment from preferences, not from budget sums
+        $totalSalary = $user->monthly_salary ?? 0;
+        $budgetPreferences = $user->budgetPreferences;
+        $investmentAmount = ($budgetPreferences && $budgetPreferences->auto_invest_enabled) 
+            ? (float) $budgetPreferences->monthly_investment_amount 
+            : 0;
+        $availableBudget = $totalSalary - $investmentAmount;
+        
+        // Calculate spending (excluding investment allocations which are automatic)
         $monthlySpending = $user->purchases()
             ->whereMonth('purchase_date', $selectedMonth)
             ->whereYear('purchase_date', $selectedYear)
+            ->where('category', '!=', 'investments') // Exclude automatic investment purchases
             ->sum('amount');
         
         // Calculate budget statistics
         $budgetStats = [
-            'total_budget' => $totalMonthlyBudget,
+            'total_salary' => $totalSalary,
+            'investment_amount' => $investmentAmount,
+            'available_budget' => $availableBudget,
+            'total_budget' => $availableBudget, // For backward compatibility with views
             'total_spent' => $monthlySpending,
-            'remaining' => $totalMonthlyBudget - $monthlySpending,
-            'percentage_used' => $totalMonthlyBudget > 0 ? ($monthlySpending / $totalMonthlyBudget) * 100 : 0,
+            'remaining' => $availableBudget - $monthlySpending,
+            'percentage_used' => $availableBudget > 0 ? ($monthlySpending / $availableBudget) * 100 : 0,
         ];
         
+        // Get purchase goals
+        $purchaseGoals = $user->purchaseGoals()
+            ->orderBy('priority')
+            ->orderBy('created_at')
+            ->take(5)
+            ->get();
+
         // Get available months that have budgets
         $availableMonths = $user->budgets()
             ->selectRaw('DISTINCT month, year')
@@ -86,6 +106,6 @@ class DashboardController extends Controller
         $selectedMonth = $selectedDate->format('F Y');
         $selectedValue = $selectedDate->month . '-' . $selectedDate->year;
         
-        return view('dashboard', compact('monthBudgets', 'recentPurchases', 'budgetStats', 'selectedMonth', 'availableMonths', 'selectedValue', 'isCurrentMonth', 'user'));
+        return view('dashboard', compact('monthBudgets', 'recentPurchases', 'budgetStats', 'selectedMonth', 'availableMonths', 'selectedValue', 'isCurrentMonth', 'user', 'purchaseGoals'));
     }
 }

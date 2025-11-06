@@ -115,4 +115,19 @@ class User extends Authenticatable
         $preferences = $this->getOrCreateBudgetPreferences();
         return $preferences->generateBudgetTemplates((float) $this->monthly_salary);
     }
+
+    public function purchaseGoals(): HasMany
+    {
+        return $this->hasMany(PurchaseGoal::class);
+    }
+
+    public function activePurchaseGoals(): HasMany
+    {
+        return $this->hasMany(PurchaseGoal::class)->active()->byPriority();
+    }
+
+    public function completedPurchaseGoals(): HasMany
+    {
+        return $this->hasMany(PurchaseGoal::class)->completed();
+    }
 }
