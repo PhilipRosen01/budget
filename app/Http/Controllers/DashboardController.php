@@ -102,7 +102,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Get available months that have budgets
+        // Get available months that have budgets (refresh from database to avoid stale data)
         $availableMonths = $user->budgets()
             ->selectRaw('DISTINCT month, year')
             ->orderByDesc('year')
@@ -116,15 +116,24 @@ class DashboardController extends Controller
                     'value' => $budget->month . '-' . $budget->year
                 ];
             });
-        
+
         // Get active templates for view
         $activeTemplates = $user->activeBudgetTemplates;
         
         $selectedMonth = $selectedDate->format('F Y');
         $selectedValue = $selectedDate->month . '-' . $selectedDate->year;
         
-        // Clear the just_deleted flag after showing the dashboard once
-        if (session()->has('just_deleted') && !session('success')) {
+        // If the selected month doesn't exist in available months and isn't current month,
+        // redirect to current month or first available month
+        $selectedExists = $availableMonths->contains('value', $selectedValue);
+        if (!$selectedExists && !$isCurrentMonth && $availableMonths->isNotEmpty()) {
+            $firstAvailable = $availableMonths->first();
+            return redirect()->route('dashboard', ['month-year' => $firstAvailable['value']]);
+        }
+        
+        // Clear the just_deleted flag after one dashboard load
+        // This prevents infinite auto-generation suppression
+        if (session()->has('just_deleted')) {
             session()->forget('just_deleted');
         }
         

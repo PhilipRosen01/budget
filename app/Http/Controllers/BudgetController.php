@@ -163,16 +163,28 @@ class BudgetController extends Controller
         // Set session flag to prevent auto-generation on dashboard
         session(['just_deleted' => true]);
         
-        // Redirect to setup page for current month with success message
+        // Redirect back to dashboard with success message
         $now = Carbon::now();
         $message = $deletedCount > 0 
-            ? "Deleted all budgets for {$monthName} ({$deletedCount} budgets removed). Set up your new budget below."
-            : "No budgets found for {$monthName}. Set up your budget below.";
+            ? "Deleted all budgets for {$monthName} ({$deletedCount} budgets removed)."
+            : "No budgets found for {$monthName}.";
             
-        return redirect()->route('budgets.setup', [
-            'month' => $now->month,
-            'year' => $now->year
-        ])->with('success', $message);
+        // After deletion, check if there are any remaining months with budgets
+        $remainingMonths = $user->budgets()
+            ->selectRaw('DISTINCT month, year')
+            ->orderByDesc('year')
+            ->orderByDesc('month')
+            ->first();
+            
+        if ($remainingMonths) {
+            // Redirect to the most recent month that still has budgets
+            return redirect()->route('dashboard', [
+                'month-year' => $remainingMonths->month . '-' . $remainingMonths->year
+            ])->with('success', $message);
+        } else {
+            // No budgets left anywhere, redirect to current month (empty state)
+            return redirect()->route('dashboard')->with('success', $message);
+        }
     }
 
 
