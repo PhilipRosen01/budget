@@ -1,59 +1,136 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Budget Manager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive Laravel budget management application with automatic GitHub deployment to Hostinger.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Personal budget tracking and management
+- Monthly budget templates with automatic generation
+- Purchase tracking with categories and budget assignment
+- Investment and savings budgets with smart progress indicators
+- Visual progress bars with intelligent color coding
+- Monthly spending analysis and breakdowns
+- Responsive design with Tailwind CSS
+- Month-to-month budget comparison
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Production Deployment via GitHub
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+This application is configured for automatic deployment from GitHub to Hostinger.
 
-## Learning Laravel
+### Environment Configuration
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+The application uses different environment files:
+- `.env.example` - Template for local development
+- `.env.production` - Production configuration template
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Automatic Deployment Process
 
-## Laravel Sponsors
+1. Push changes to the `main` branch
+2. Hostinger automatically pulls updates
+3. Post-deployment script runs automatically
+4. Application rebuilds assets and clears caches
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Server Requirements
 
-### Premium Partners
+- PHP 8.1+
+- MySQL 5.7+
+- Node.js 18+ (for asset building)
+- Composer
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### First Time Setup on Hostinger
+
+1. Connect GitHub repository to Hostinger
+2. Configure database credentials in `.env`
+3. Run initial migration: `php artisan migrate --force`
+4. Set storage permissions: `chmod -R 755 storage bootstrap/cache`
+5. Create storage link: `php artisan storage:link`
+
+### Post-Deployment Commands (Automated)
+
+```bash
+composer install --optimize-autoloader --no-dev
+npm ci
+npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+## Local Development
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/budget-manager.git
+   cd budget-manager
+   ```
+
+2. Install dependencies:
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. Environment setup:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Database setup:
+   ```bash
+   php artisan migrate
+   php artisan db:seed  # Optional: Add sample data
+   ```
+
+5. Build assets and start development:
+   ```bash
+   npm run dev
+   php artisan serve
+   ```
+
+## Technologies Used
+
+- **Backend**: Laravel 11, PHP 8.1+
+- **Database**: SQLite (development), MySQL (production)
+- **Frontend**: Blade templates, Tailwind CSS, Alpine.js
+- **Build Tools**: Vite
+- **Deployment**: GitHub + Hostinger Auto-Deploy
+
+## Project Structure
+
+- **Budget Templates**: Reusable monthly budget configurations
+- **Monthly Budgets**: Generated from templates for specific months
+- **Purchases**: Individual transactions linked to budgets
+- **Categories**: Smart categorization with color-coded progress
+- **Dashboard**: Comprehensive overview with visual analytics
+
+## Key Features
+
+### Smart Budget Progress
+- **Investment/Savings**: Green progress bars (good to complete)
+- **Spending Categories**: Blue → Yellow → Red progression
+- **Visual Feedback**: Immediate understanding of budget health
+
+### Intelligent Category Handling
+- Automatic category inheritance from budgets
+- Flexible purchase categorization
+- Monthly breakdown analysis
+
+### Responsive Design
+- Mobile-first approach
+- Clean, intuitive interface
+- Accessible color schemes and typography
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes and test locally
+4. Commit with clear messages: `git commit -m "Add feature description"`
+5. Push to your fork: `git push origin feature-name`
+6. Create a Pull Request
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

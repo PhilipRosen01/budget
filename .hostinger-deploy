@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Hostinger Post-Deployment Script
+# This script runs automatically after each GitHub deployment
+
+echo "🚀 Starting post-deployment process..."
+
+# Set proper permissions
+echo "🔐 Setting file permissions..."
+chmod -R 755 storage
+chmod -R 755 bootstrap/cache
+
+# Install/update Composer dependencies for production
+echo "📦 Installing Composer dependencies..."
+composer install --optimize-autoloader --no-dev --no-interaction
+
+# Install/update Node.js dependencies
+echo "📦 Installing Node.js dependencies..."
+npm ci --only=production
+
+# Build production assets
+echo "🎨 Building production assets..."
+npm run build
+
+# Run database migrations
+echo "🗄️ Running database migrations..."
+php artisan migrate --force
+
+# Clear and cache configurations
+echo "🧹 Clearing caches..."
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
+
+echo "⚡ Caching configurations..."
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Create storage symlink if it doesn't exist
+echo "🔗 Creating storage symlink..."
+php artisan storage:link
+
+# Set final permissions
+echo "🔐 Final permission adjustments..."
+chmod -R 755 storage
+chmod -R 755 bootstrap/cache
+
+echo "✅ Post-deployment process completed successfully!"
+echo "🌐 Your Budget Manager application is now live and updated!"
+
+# Optional: Log deployment
+echo "$(date): Deployment completed successfully" >> storage/logs/deployments.log
