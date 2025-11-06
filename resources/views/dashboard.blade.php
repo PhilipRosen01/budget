@@ -6,7 +6,9 @@
                     Budget Dashboard - {{ $selectedMonth }}
                 </h2>
                 @if($isCurrentMonth)
-           <p class="text-sm text-green-600">Current Month</p>
+           <p class="text-                <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->ifdif
+
+            <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->0">Current Month</p>
                 @endif
             </div>
             
@@ -340,20 +342,8 @@
             </div>
             @endif
 
-
-
-
-                        <a href="{{ route('budgets.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2M8 7v4"></path>
-                            </svg>
-                            View Monthly Budgets
-                        </a>
-                    </div>
-                </div>
-            </div>
-
             <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->
+            @if($monthBudgets->count() > 0)
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Current Month Budgets -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -471,6 +461,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <!-- Generate Other Month Modal -->
     <div id="generateMonthModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
