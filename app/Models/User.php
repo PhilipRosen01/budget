@@ -52,6 +52,11 @@ class User extends Authenticatable
         return $this->hasMany(Budget::class);
     }
 
+    public function budgetTemplates(): HasMany
+    {
+        return $this->hasMany(BudgetTemplate::class);
+    }
+
     public function purchases(): HasMany
     {
         return $this->hasMany(Purchase::class);
@@ -60,5 +65,18 @@ class User extends Authenticatable
     public function activeBudgets(): HasMany
     {
         return $this->hasMany(Budget::class)->where('is_active', true);
+    }
+
+    public function activeBudgetTemplates(): HasMany
+    {
+        return $this->hasMany(BudgetTemplate::class)->where('is_active', true);
+    }
+
+    public function currentMonthBudgets(): HasMany
+    {
+        $now = \Carbon\Carbon::now();
+        return $this->hasMany(Budget::class)
+            ->where('month', $now->month)
+            ->where('year', $now->year);
     }
 }

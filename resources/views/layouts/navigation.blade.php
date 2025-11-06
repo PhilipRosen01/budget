@@ -15,8 +15,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*')">
+                        {{ __('Templates') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*')">
-                        {{ __('Budgets') }}
+                        {{ __('Monthly Budgets') }}
                     </x-nav-link>
                     <x-nav-link :href="route('purchases.index')" :active="request()->routeIs('purchases.*')">
                         {{ __('Purchases') }}
@@ -76,8 +79,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*')">
+                {{ __('Templates') }}
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*')">
-                {{ __('Budgets') }}
+                {{ __('Monthly Budgets') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('purchases.index')" :active="request()->routeIs('purchases.*')">
                 {{ __('Purchases') }}

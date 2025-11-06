@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\BudgetTemplateController;
 use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +19,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Budget management routes
+    // Budget template management routes
+    Route::resource('budget-templates', BudgetTemplateController::class);
+    Route::post('/budget-templates/generate-next-month', [BudgetTemplateController::class, 'generateNextMonth'])
+        ->name('budget-templates.generate-next-month');
+    
+    // Monthly budget management routes
     Route::resource('budgets', BudgetController::class);
     
     // Purchase management routes

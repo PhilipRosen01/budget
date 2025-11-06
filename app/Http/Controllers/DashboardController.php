@@ -11,9 +11,25 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $now = Carbon::now();
         
-        // Get active budgets
-        $activeBudgets = $user->activeBudgets()->with('purchases')->get();
+        // Get current month's budgets
+        $currentMonthBudgets = $user->budgets()
+            ->with('purchases')
+            ->currentMonth()
+            ->get();
+        
+        // Generate budgets for current month if none exist
+        if ($currentMonthBudgets->isEmpty() && $user->activeBudgetTemplates->isNotEmpty()) {
+            foreach ($user->activeBudgetTemplates as $template) {
+                $template->createMonthlyBudget($now->month, $now->year);
+            }
+            // Reload budgets after creation
+            $currentMonthBudgets = $user->budgets()
+                ->with('purchases')
+                ->currentMonth()
+                ->get();
+        }
         
         // Get recent purchases
         $recentPurchases = $user->purchases()
@@ -23,15 +39,12 @@ class DashboardController extends Controller
             ->get();
         
         // Calculate total monthly budget and spending
-        $monthlyBudgets = $activeBudgets->where('period', 'monthly');
-        $yearlyBudgets = $activeBudgets->where('period', 'yearly');
-        
-        $totalMonthlyBudget = $monthlyBudgets->sum('amount') + ($yearlyBudgets->sum('amount') / 12);
+        $totalMonthlyBudget = $currentMonthBudgets->sum('amount');
         
         // Calculate this month's spending
-        $currentMonth = Carbon::now()->startOfMonth();
         $monthlySpending = $user->purchases()
-            ->where('purchase_date', '>=', $currentMonth)
+            ->whereMonth('purchase_date', $now->month)
+            ->whereYear('purchase_date', $now->year)
             ->sum('amount');
         
         // Calculate budget statistics
@@ -42,6 +55,8 @@ class DashboardController extends Controller
             'percentage_used' => $totalMonthlyBudget > 0 ? ($monthlySpending / $totalMonthlyBudget) * 100 : 0,
         ];
         
-        return view('dashboard', compact('activeBudgets', 'recentPurchases', 'budgetStats'));
+        $currentMonth = $now->format('F Y');
+        
+        return view('dashboard', compact('currentMonthBudgets', 'recentPurchases', 'budgetStats', 'currentMonth'));
     }
 }

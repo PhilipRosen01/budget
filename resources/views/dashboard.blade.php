@@ -112,11 +112,11 @@
                 <div class="p-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="{{ route('budgets.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <a href="{{ route('budget-templates.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            Create Budget
+                            Create Template
                         </a>
                         <a href="{{ route('purchases.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,27 +126,32 @@
                         </a>
                         <a href="{{ route('budgets.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2M8 7v4"></path>
                             </svg>
-                            View Budgets
+                            View Monthly Budgets
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Active Budgets and Recent Purchases -->
+            <!-- Current Month Budgets and Recent Purchases -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Active Budgets -->
+                <!-- Current Month Budgets -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Active Budgets</h3>
-                        @if($activeBudgets->count() > 0)
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">{{ $currentMonth }} Budgets</h3>
+                            <a href="{{ route('budget-templates.index') }}" class="text-sm text-blue-600 hover:text-blue-900">Manage Templates</a>
+                        </div>
+                        @if($currentMonthBudgets->count() > 0)
                             <div class="space-y-4">
-                                @foreach($activeBudgets as $budget)
+                                @foreach($currentMonthBudgets as $budget)
                                 <div class="border-l-4 border-blue-400 pl-4">
                                     <div class="flex justify-between">
                                         <h4 class="text-sm font-medium text-gray-900">{{ $budget->name }}</h4>
-                                        <span class="text-sm text-gray-500">{{ ucfirst($budget->period) }}</span>
+                                        @if($budget->category)
+                                            <span class="text-sm text-gray-500">{{ $budget->category }}</span>
+                                        @endif
                                     </div>
                                     <p class="text-sm text-gray-600">
                                         ${{ number_format($budget->totalSpent(), 2) }} / ${{ number_format($budget->amount, 2) }}
@@ -158,7 +163,10 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-gray-500">No active budgets. <a href="{{ route('budgets.create') }}" class="text-blue-600 hover:text-blue-900">Create one now</a></p>
+                            <div class="text-center py-4">
+                                <p class="text-gray-500 mb-2">No budgets for {{ $currentMonth }}</p>
+                                <a href="{{ route('budget-templates.create') }}" class="text-blue-600 hover:text-blue-900 text-sm">Create Budget Template</a>
+                            </div>
                         @endif
                     </div>
                 </div>

@@ -2,14 +2,22 @@
     <x-slot name="header">
         <div class="flex justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('My Budgets') }}
+                Monthly Budgets - {{ $currentDate->format('F Y') }}
             </h2>
-            <a href="{{ route('budgets.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create Budget
-            </a>
+            <div class="flex space-x-2">
+                <a href="{{ route('budget-templates.index') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Manage Templates
+                </a>
+                <a href="{{ route('budgets.create', ['month' => $month, 'year' => $year]) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Custom Budget
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -21,6 +29,32 @@
                 </div>
             @endif
 
+            <!-- Month Navigation -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Browse by Month</h3>
+                            <p class="text-sm text-gray-600 mt-1">View and manage budgets for different months</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            @if(count($availableMonths) > 1)
+                                <select onchange="window.location.href='{{ route('budgets.index') }}?month=' + this.value.split('-')[0] + '&year=' + this.value.split('-')[1]" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    @foreach($availableMonths as $monthData)
+                                        <option value="{{ $monthData['month'] }}-{{ $monthData['year'] }}" {{ $monthData['month'] == $month && $monthData['year'] == $year ? 'selected' : '' }}>
+                                            {{ $monthData['display'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @endif
+                            <span class="text-sm text-gray-500 self-center">
+                                {{ $budgets->count() }} budget{{ $budgets->count() !== 1 ? 's' : '' }} found
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if($budgets->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($budgets as $budget)
@@ -29,7 +63,22 @@
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $budget->name }}</h3>
-                                        <p class="text-sm text-gray-500">{{ ucfirst($budget->period) }} Budget</p>
+                                        <div class="flex items-center space-x-2">
+                                            @if($budget->category)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {{ $budget->category }}
+                                                </span>
+                                            @endif
+                                            @if($budget->budgetTemplate)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    From Template
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                    Custom
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                     <div class="flex space-x-2">
                                         <a href="{{ route('budgets.edit', $budget) }}" class="text-blue-600 hover:text-blue-900">
@@ -37,7 +86,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                             </svg>
                                         </a>
-                                        <form action="{{ route('budgets.destroy', $budget) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this budget?')">
+                                        <form action="{{ route('budgets.destroy', $budget) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this budget for {{ $budget->monthName }} {{ $budget->year }}?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-900">
@@ -69,9 +118,9 @@
                                 </div>
 
                                 <div class="text-sm text-gray-600">
-                                    <p>Start: {{ $budget->start_date->format('M j, Y') }}</p>
-                                    @if($budget->end_date)
-                                        <p>End: {{ $budget->end_date->format('M j, Y') }}</p>
+                                    <p class="font-medium">{{ $budget->fullMonthYear }}</p>
+                                    @if($budget->isCurrentMonth())
+                                        <p class="text-green-600 text-xs">Current Month</p>
                                     @endif
                                     <p class="mt-2">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $budget->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
@@ -84,10 +133,13 @@
                                     <p class="text-sm text-gray-600 mt-3">{{ $budget->description }}</p>
                                 @endif
 
-                                <div class="mt-4">
+                                <div class="mt-4 flex justify-between">
                                     <a href="{{ route('budgets.show', $budget) }}" class="text-blue-600 hover:text-blue-900 text-sm font-medium">
                                         View Details →
                                     </a>
+                                    <span class="text-xs text-gray-500">
+                                        {{ $budget->purchases->count() }} purchase{{ $budget->purchases->count() !== 1 ? 's' : '' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
