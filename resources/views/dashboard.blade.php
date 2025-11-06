@@ -273,7 +273,21 @@
                         @foreach($categoryTotals as $categoryData)
                             @php
                                 $percentage = $categoryData['budgeted'] > 0 ? ($categoryData['spent'] / $categoryData['budgeted']) * 100 : 0;
-                                $barColor = $percentage > 90 ? 'red' : ($percentage > 75 ? 'yellow' : 'green');
+                                $isInvestmentOrSavings = in_array(strtolower($categoryData['category']), ['investments', 'savings']);
+                                
+                                if ($isInvestmentOrSavings) {
+                                    // Investments and savings are always green (good thing to fill up)
+                                    $barColor = 'green';
+                                } else {
+                                    // Other categories: blue → yellow → red as they fill up
+                                    if ($percentage >= 100) {
+                                        $barColor = 'red';
+                                    } elseif ($percentage >= 75) {
+                                        $barColor = 'yellow';
+                                    } else {
+                                        $barColor = 'blue';
+                                    }
+                                }
                             @endphp
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex justify-between items-center mb-2">
@@ -373,7 +387,19 @@
                                         ${{ number_format($budget->totalSpent(), 2) }} / ${{ number_format($budget->amount, 2) }}
                                     </p>
                                     <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ min($budget->percentageUsed(), 100) }}%"></div>
+                                        @php
+                                            $percentage = $budget->percentageUsed();
+                                            $isInvestmentOrSavings = in_array(strtolower($budget->category), ['investments', 'savings']);
+                                            
+                                            if ($percentage >= 100) {
+                                                $color = $isInvestmentOrSavings ? 'green' : 'red';
+                                            } elseif ($percentage >= 75) {
+                                                $color = 'yellow';
+                                            } else {
+                                                $color = 'blue';
+                                            }
+                                        @endphp
+                                        <div class="bg-{{ $color }}-600 h-2 rounded-full" style="width: {{ min($percentage, 100) }}%"></div>
                                     </div>
                                 </div>
                                 @endforeach
