@@ -85,17 +85,22 @@ class PurchaseController extends Controller
             'purchase_date' => 'required|date',
         ]);
 
-        // Verify budget belongs to user if provided
+        // Verify budget belongs to user if provided and set category from budget if not specified
         if ($validated['budget_id']) {
             $budget = Budget::find($validated['budget_id']);
             if ($budget->user_id !== Auth::id()) {
                 abort(403);
             }
+            
+            // If no category is specified, use the budget's category
+            if (empty($validated['category']) && $budget->category) {
+                $validated['category'] = $budget->category;
+            }
         }
 
         Auth::user()->purchases()->create($validated);
 
-        return redirect()->route('purchases.index')->with('success', 'Purchase added successfully!');
+        return redirect()->route('dashboard')->with('success', 'Purchase added successfully!');
     }
 
     /**

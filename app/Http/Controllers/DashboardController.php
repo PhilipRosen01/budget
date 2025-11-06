@@ -77,22 +77,24 @@ class DashboardController extends Controller
             : 0;
         $availableBudget = $totalSalary - $investmentAmount;
         
-        // Calculate spending (excluding investment allocations which are automatic)
+        // Calculate spending (including all purchases and budget allocations)
         $monthlySpending = $user->purchases()
             ->whereMonth('purchase_date', $selectedMonth)
             ->whereYear('purchase_date', $selectedYear)
-            ->where('category', '!=', 'investments') // Exclude automatic investment purchases
             ->sum('amount');
+
+        // Calculate total budget allocated for the month (including investments)
+        $totalBudgetAllocated = $monthBudgets->sum('amount');
         
         // Calculate budget statistics
         $budgetStats = [
             'total_salary' => $totalSalary,
             'investment_amount' => $investmentAmount,
             'available_budget' => $availableBudget,
-            'total_budget' => $availableBudget, // For backward compatibility with views
+            'total_budget' => $totalBudgetAllocated > 0 ? $totalBudgetAllocated : $availableBudget,
             'total_spent' => $monthlySpending,
-            'remaining' => $availableBudget - $monthlySpending,
-            'percentage_used' => $availableBudget > 0 ? ($monthlySpending / $availableBudget) * 100 : 0,
+            'remaining' => $totalBudgetAllocated - $monthlySpending,
+            'percentage_used' => $totalBudgetAllocated > 0 ? ($monthlySpending / $totalBudgetAllocated) * 100 : 0,
         ];
         
         // Get purchase goals

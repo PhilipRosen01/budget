@@ -44,7 +44,7 @@
                                 <option value="">No specific budget</option>
                                 @foreach($budgets as $budget)
                                     <option value="{{ $budget->id }}" {{ (old('budget_id') ?? request('budget_id')) == $budget->id ? 'selected' : '' }}>
-                                        {{ $budget->name }} ({{ ucfirst($budget->period) }})
+                                        {{ $budget->name }} ({{ $budget->category ? ucfirst($budget->category) : 'General' }})
                                     </option>
                                 @endforeach
                             </select>
