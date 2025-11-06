@@ -22,6 +22,7 @@ class BudgetPreference extends Model
         'no_gas',
         'no_maintenance',
         'no_subscriptions',
+        'no_debt',
         'housing_percentage',
         'transportation_percentage',
         'food_percentage',
@@ -123,6 +124,9 @@ class BudgetPreference extends Model
                     break;
                 case 'miscellaneous':
                     $isExempt = $this->no_subscriptions;
+                    break;
+                case 'debt':
+                    $isExempt = $this->no_debt;
                     break;
             }
 

@@ -54,6 +54,7 @@
                         'no_gas' => ['label' => 'Gas/Fuel', 'description' => 'No car or employer-provided'],
                         'no_maintenance' => ['label' => 'Car Maintenance', 'description' => 'No car or covered elsewhere'],
                         'no_subscriptions' => ['label' => 'Subscriptions', 'description' => 'No streaming/software subscriptions'],
+                        'no_debt' => ['label' => 'Debt Payments', 'description' => 'No credit cards, loans, or debt to pay off'],
                     ];
                 @endphp
 

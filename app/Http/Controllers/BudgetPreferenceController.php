@@ -27,6 +27,7 @@ class BudgetPreferenceController extends Controller
             'no_gas' => 'boolean',
             'no_maintenance' => 'boolean',
             'no_subscriptions' => 'boolean',
+            'no_debt' => 'boolean',
             'housing_percentage' => 'nullable|numeric|min:0|max:100',
             'transportation_percentage' => 'nullable|numeric|min:0|max:100',
             'food_percentage' => 'nullable|numeric|min:0|max:100',
@@ -53,7 +54,7 @@ class BudgetPreferenceController extends Controller
         $preferencesData = $request->only([
             'no_rent', 'no_car_payment', 'no_insurance', 'no_groceries',
             'no_phone_payment', 'no_utilities', 'no_internet', 'no_gas',
-            'no_maintenance', 'no_subscriptions', 'housing_percentage',
+            'no_maintenance', 'no_subscriptions', 'no_debt', 'housing_percentage',
             'transportation_percentage', 'food_percentage', 'savings_percentage',
             'insurance_percentage', 'debt_percentage', 'personal_percentage',
             'utilities_percentage', 'miscellaneous_percentage',

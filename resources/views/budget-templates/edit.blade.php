@@ -121,27 +121,27 @@
                             <p class="mt-1 text-xs text-gray-600">Only active templates will be used to generate monthly budgets.</p>
                         </div>
 
-                        <div class="flex items-center justify-between">
-                            <div class="flex space-x-3">
-                                <x-primary-button>
-                                    {{ __('Update Template') }}
-                                </x-primary-button>
+                        <div class="flex items-center space-x-3">
+                            <x-primary-button>
+                                {{ __('Update Template') }}
+                            </x-primary-button>
 
-                                <a href="{{ route('budget-templates.show', $budgetTemplate) }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    Cancel
-                                </a>
-                            </div>
-
-                            <!-- Delete Button -->
-                            <form action="{{ route('budget-templates.destroy', $budgetTemplate) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this template? This will not delete existing monthly budgets created from this template.')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    Delete Template
-                                </button>
-                            </form>
+                            <a href="{{ route('budget-templates.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                Cancel
+                            </a>
                         </div>
                     </form>
+
+                    <!-- Delete Button (separate form) -->
+                    <div class="mt-4 flex justify-end">
+                        <form action="{{ route('budget-templates.destroy', $budgetTemplate) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this template? This will not delete existing monthly budgets created from this template.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                Delete Template
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 

@@ -93,9 +93,15 @@ class BudgetTemplateController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $budgetTemplate->update($validated);
+        // Handle checkbox - if not present in request, it means it's unchecked
+        $validated['is_active'] = $request->has('is_active') ? true : false;
 
-        return redirect()->route('budget-templates.index')->with('success', 'Budget template updated successfully!');
+        try {
+            $budgetTemplate->update($validated);
+            return redirect()->route('budget-templates.index')->with('success', 'Budget template updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Failed to update template: ' . $e->getMessage()])->withInput();
+        }
     }
 
     /**
