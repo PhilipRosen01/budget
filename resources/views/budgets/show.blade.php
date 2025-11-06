@@ -32,10 +32,12 @@
                                     <dt class="text-sm font-medium text-gray-500">Amount</dt>
                                     <dd class="text-sm text-gray-900">${{ number_format($budget->amount, 2) }}</dd>
                                 </div>
+                                @if($budget->start_date)
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">Start Date</dt>
                                     <dd class="text-sm text-gray-900">{{ $budget->start_date->format('M j, Y') }}</dd>
                                 </div>
+                                @endif
                                 @if($budget->end_date)
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">End Date</dt>
@@ -154,7 +156,7 @@
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $purchase->purchase_date->format('M j, Y') }}
+                                                {{ $purchase->purchase_date ? $purchase->purchase_date->format('M j, Y') : 'No date' }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
