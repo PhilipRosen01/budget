@@ -327,6 +327,11 @@ class BudgetController extends Controller
             : 0;
         $availableBudget = $totalSalary - $investmentAmount;
         
+        // Regenerate templates with correct amounts if needed
+        if ($budgetPreferences && $totalSalary > 0) {
+            $this->ensureTemplatesHaveCorrectAmounts($user, $budgetPreferences, $totalSalary);
+        }
+        
         // Get all active templates
         $templates = $user->budgetTemplates()->where('is_active', true)->get();
         
@@ -350,6 +355,24 @@ class BudgetController extends Controller
             'availableBudget', 'templates', 'automaticTemplates', 'existingBudgets',
             'budgetPreferences'
         ));
+    }
+    
+    private function ensureTemplatesHaveCorrectAmounts($user, $budgetPreferences, $totalSalary)
+    {
+        // Get fresh template data based on current salary
+        $freshTemplates = $budgetPreferences->generateBudgetTemplates($totalSalary);
+        
+        // Update existing templates with correct amounts
+        foreach ($freshTemplates as $templateData) {
+            $existingTemplate = $user->budgetTemplates()
+                ->where('category', $templateData['category'])
+                ->where('is_active', true)
+                ->first();
+                
+            if ($existingTemplate && $existingTemplate->amount != $templateData['amount']) {
+                $existingTemplate->update(['amount' => $templateData['amount']]);
+            }
+        }
     }
 
     /**

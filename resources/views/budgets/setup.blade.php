@@ -141,7 +141,7 @@
                                 <div class="text-sm text-gray-500">Total Allocated</div>
                             </div>
                             <div class="text-center">
-                                <div class="text-lg font-bold text-green-600" id="remaining-budget">${{ number_format($availableBudget, 2) }}</div>
+                                <div class="text-lg font-bold text-green-600" id="remaining-budget">${{ number_format($totalSalary, 2) }}</div>
                                 <div class="text-sm text-gray-500">Remaining</div>
                             </div>
                             <div class="text-center">
@@ -230,7 +230,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const availableBudget = {{ $availableBudget }};
+            const totalSalary = {{ $totalSalary }};
             let totalAllocated = 0;
             let selectedCount = 0;
 
@@ -276,7 +276,7 @@
                     }
                 });
 
-                const remaining = availableBudget - totalAllocated;
+                const remaining = totalSalary - totalAllocated;
                 const isOverBudget = remaining < 0;
 
                 // Update displays

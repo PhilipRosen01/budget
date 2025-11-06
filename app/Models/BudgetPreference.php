@@ -147,17 +147,13 @@ class BudgetPreference extends Model
      */
     public function generateBudgetTemplates(float $monthlySalary): array
     {
-        // Calculate available budget after investment allocation
-        $investmentAmount = $this->auto_invest_enabled ? (float) $this->monthly_investment_amount : 0;
-        $availableBudget = $monthlySalary - $investmentAmount;
-        
         $percentages = $this->getAdjustedPercentages();
         $templates = [];
 
-        // Generate regular budget templates based on available budget (after investment)
+        // Generate regular budget templates based on FULL SALARY (investment is separate)
         foreach ($percentages as $category => $percentage) {
             if ($percentage > 0) {
-                $amount = ($availableBudget * $percentage) / 100;
+                $amount = ($monthlySalary * $percentage) / 100;
                 $templates[] = [
                     'name' => ucfirst($category),
                     'category' => $category,
