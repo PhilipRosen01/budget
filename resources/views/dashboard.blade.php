@@ -6,7 +6,7 @@
                     Budget Dashboard - {{ $selectedMonth }}
                 </h2>
                 @if($isCurrentMonth)
-                    <p class="text-sm text-green-600">Current Month</p>
+           <p class="text-sm text-green-600">Current Month</p>
                 @endif
             </div>
             
@@ -16,7 +16,7 @@
                     <div class="flex items-center space-x-2">
                         <label for="month-selector" class="text-sm font-medium text-gray-700">View Month:</label>
                         <form method="GET" action="{{ route('dashboard') }}" class="inline">
-                            <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-48 px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 @foreach($availableMonths as $month)
                                     <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
                                         {{ $month['display'] }}
@@ -27,6 +27,16 @@
                     </div>
                 @endif
                 
+                <!-- Generate Other Month Button -->
+                @if($activeTemplates->count() > 0)
+                    <button type="button" onclick="openGenerateMonthModal()" class="inline-flex items-center px-3 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 mr-2">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Generate Other Month
+                    </button>
+                @endif
+
                 <!-- Delete Month Budget Button -->
                 @if($monthBudgets->count() > 0)
                     <form method="POST" action="{{ route('budgets.destroy-month') }}" class="inline" onsubmit="return confirm('Are you sure you want to delete ALL budgets and purchases for {{ $selectedMonth }}? This cannot be undone.')">
@@ -130,6 +140,33 @@
                                 </dl>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <a href="{{ route('budget-templates.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Create Template
+                        </a>
+                        <a href="{{ route('purchases.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                            Add Purchase
+                        </a>
+                        <a href="{{ route('budgets.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H6a2 2 0 00-2 2v10a2 2 0 002-2V9a2 2 0 00-2-2h-2M8 7v4"></path>
+                            </svg>
+                            View Monthly Budgets
+                        </a>
                     </div>
                 </div>
             </div>
@@ -303,23 +340,9 @@
             </div>
             @endif
 
-            <!-- Quick Actions -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="{{ route('budget-templates.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Create Template
-                        </a>
-                        <a href="{{ route('purchases.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                            </svg>
-                            Add Purchase
-                        </a>
+
+
+
                         <a href="{{ route('budgets.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2M8 7v4"></path>
@@ -448,4 +471,113 @@
             </div>
         </div>
     </div>
+
+    <!-- Generate Other Month Modal -->
+    <div id="generateMonthModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Generate Budget for Another Month</h3>
+                
+                <form method="POST" action="{{ route('budgets.create-from-templates') }}" id="generateMonthForm">
+                    @csrf
+                    
+                    <div class="mb-4">
+                        <label for="generate_month" class="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                        <select name="month" id="generate_month" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                            @php
+                                $currentMonth = now()->month;
+                                $currentYear = now()->year;
+                                $months = [
+                                    1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+                                    5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+                                    9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+                                ];
+                            @endphp
+                            @foreach($months as $num => $month)
+                                <option value="{{ $num }}">{{ $month }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="generate_year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                        <select name="year" id="generate_year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                            @for($year = $currentYear; $year <= $currentYear + 3; $year++)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    This will create budgets from your {{ $activeTemplates->count() }} active template{{ $activeTemplates->count() !== 1 ? 's' : '' }} for the selected month.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeGenerateMonthModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            Generate Budgets
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openGenerateMonthModal() {
+        // Set default to next month
+        const now = new Date();
+        let nextMonth = now.getMonth() + 2; // +2 because getMonth() is 0-based and we want next month
+        let nextYear = now.getFullYear();
+        
+        if (nextMonth > 12) {
+            nextMonth = 1;
+            nextYear++;
+        }
+        
+        document.getElementById('generate_month').value = nextMonth;
+        document.getElementById('generate_year').value = nextYear;
+        document.getElementById('generateMonthModal').classList.remove('hidden');
+    }
+
+    function closeGenerateMonthModal() {
+        document.getElementById('generateMonthModal').classList.add('hidden');
+    }
+
+    // Validation to ensure only future dates can be selected
+    document.getElementById('generateMonthForm').addEventListener('submit', function(e) {
+        const selectedMonth = parseInt(document.getElementById('generate_month').value);
+        const selectedYear = parseInt(document.getElementById('generate_year').value);
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; // Convert to 1-based
+        const currentYear = now.getFullYear();
+        
+        // Check if selected date is in the past
+        if (selectedYear < currentYear || (selectedYear === currentYear && selectedMonth <= currentMonth)) {
+            e.preventDefault();
+            alert('Please select a future month. You can only generate budgets for upcoming months.');
+            return false;
+        }
+    });
+
+    // Close modal when clicking outside of it
+    document.getElementById('generateMonthModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeGenerateMonthModal();
+        }
+    });
+    </script>
 </x-app-layout>

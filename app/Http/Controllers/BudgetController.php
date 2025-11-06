@@ -229,10 +229,22 @@ class BudgetController extends Controller
      */
     public function createFromTemplates(Request $request)
     {
+        $validated = $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2020|max:2050',
+        ]);
+        
         $user = Auth::user();
         $now = Carbon::now();
-        $month = $request->get('month', $now->month);
-        $year = $request->get('year', $now->year);
+        $month = $validated['month'];
+        $year = $validated['year'];
+        
+        // Ensure we're only creating budgets for future months
+        $selectedDate = Carbon::create($year, $month, 1);
+        if ($selectedDate->lte($now->startOfMonth())) {
+            return redirect()->back()
+                ->with('error', 'You can only generate budgets for future months.');
+        }
         
         $createdCount = 0;
         
