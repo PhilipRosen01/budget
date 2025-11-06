@@ -31,9 +31,21 @@
                             </p>
                         </div>
                         <div class="flex space-x-2">
+                            <form action="{{ route('budget-templates.generate-current-month') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center px-3 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Generate Current Month
+                                </button>
+                            </form>
                             <form action="{{ route('budget-templates.generate-next-month') }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center px-3 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
                                     Generate Next Month
                                 </button>
                             </form>
@@ -49,9 +61,19 @@
                             <div class="p-6">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
-                                        <h3 class="text-lg font-semibold text-gray-900">{{ $template->name }}</h3>
+                                        <div class="flex items-center space-x-2">
+                                            <h3 class="text-lg font-semibold text-gray-900">{{ $template->name }}</h3>
+                                            @if($template->is_automatic)
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Auto
+                                                </span>
+                                            @endif
+                                        </div>
                                         @if($template->category)
-                                            <p class="text-sm text-gray-500">{{ $template->category }}</p>
+                                            <p class="text-sm text-gray-500">{{ ucfirst(str_replace('_', ' ', $template->category)) }}</p>
                                         @endif
                                     </div>
                                     <div class="flex space-x-2">

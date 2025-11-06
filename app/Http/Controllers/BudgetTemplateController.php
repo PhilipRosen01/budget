@@ -136,4 +136,29 @@ class BudgetTemplateController extends Controller
 
         return redirect()->route('budgets.index')->with('success', $message);
     }
+
+    /**
+     * Generate budgets for current month
+     */
+    public function generateCurrentMonth()
+    {
+        $currentMonth = Carbon::now();
+        $user = Auth::user();
+        $generatedCount = 0;
+
+        foreach ($user->activeBudgetTemplates as $template) {
+            $existingBudget = $template->budgetForMonth($currentMonth->month, $currentMonth->year);
+            
+            if (!$existingBudget) {
+                $template->createMonthlyBudget($currentMonth->month, $currentMonth->year);
+                $generatedCount++;
+            }
+        }
+
+        $message = $generatedCount > 0 
+            ? "Generated {$generatedCount} budgets for " . $currentMonth->format('F Y')
+            : "All budgets for " . $currentMonth->format('F Y') . " already exist";
+
+        return redirect()->route('budgets.index')->with('success', $message);
+    }
 }

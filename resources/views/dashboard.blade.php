@@ -1,8 +1,31 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Budget Dashboard') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Budget Dashboard') }} - {{ $selectedMonth }}
+                </h2>
+                @if($isCurrentMonth)
+                    <p class="text-sm text-green-600">Current Month</p>
+                @endif
+            </div>
+            
+            <!-- Month Selector -->
+            @if($availableMonths->count() > 0)
+                <div class="flex items-center space-x-2">
+                    <label for="month-selector" class="text-sm font-medium text-gray-700">View Month:</label>
+                    <form method="GET" action="{{ route('dashboard') }}" class="inline">
+                        <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            @foreach($availableMonths as $month)
+                                <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
+                                    {{ $month['display'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+            @endif
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -107,6 +130,102 @@
             </div>
             @endif
 
+            <!-- Spending Breakdown by Category -->
+            @if($monthBudgets->count() > 0)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-6">Spending Breakdown by Category</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @php
+                            $categoryTotals = $monthBudgets->groupBy('category')->map(function($budgets, $category) {
+                                return [
+                                    'category' => $category ?: 'General',
+                                    'budgeted' => $budgets->sum('amount'),
+                                    'spent' => $budgets->sum(function($budget) { return $budget->totalSpent(); }),
+                                    'count' => $budgets->count()
+                                ];
+                            })->sortByDesc('budgeted');
+                        @endphp
+                        
+                        @foreach($categoryTotals as $categoryData)
+                            @php
+                                $percentage = $categoryData['budgeted'] > 0 ? ($categoryData['spent'] / $categoryData['budgeted']) * 100 : 0;
+                                $barColor = $percentage > 90 ? 'red' : ($percentage > 75 ? 'yellow' : 'green');
+                            @endphp
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="text-sm font-medium text-gray-900">{{ ucfirst(str_replace('_', ' ', $categoryData['category'])) }}</h4>
+                                    <span class="text-xs text-gray-500">{{ $categoryData['count'] }} budget{{ $categoryData['count'] !== 1 ? 's' : '' }}</span>
+                                </div>
+                                <div class="text-2xl font-bold text-gray-900 mb-1">
+                                    ${{ number_format($categoryData['spent'], 2) }}
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">
+                                    of ${{ number_format($categoryData['budgeted'], 2) }}
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                                    <div class="bg-{{ $barColor }}-500 h-2 rounded-full transition-all duration-300" style="width: {{ min($percentage, 100) }}%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ number_format($percentage, 1) }}% used
+                                    @if($categoryData['budgeted'] - $categoryData['spent'] >= 0)
+                                        • ${{ number_format($categoryData['budgeted'] - $categoryData['spent'], 2) }} remaining
+                                    @else
+                                        • ${{ number_format($categoryData['spent'] - $categoryData['budgeted'], 2) }} over budget
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Monthly Comparison Chart -->
+            @if($availableMonths->count() > 1)
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-6">Monthly Spending Trend</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        @php
+                            $monthlyStats = $availableMonths->take(4)->map(function($month) use ($user) {
+                                $monthBudgets = $user->budgets()->forMonth($month['month'], $month['year'])->get();
+                                $totalBudget = $monthBudgets->sum('amount');
+                                $totalSpent = $monthBudgets->sum(function($budget) { return $budget->totalSpent(); });
+                                return [
+                                    'display' => $month['display'],
+                                    'budgeted' => $totalBudget,
+                                    'spent' => $totalSpent,
+                                    'percentage' => $totalBudget > 0 ? ($totalSpent / $totalBudget) * 100 : 0
+                                ];
+                            });
+                        @endphp
+                        
+                        @foreach($monthlyStats as $monthStat)
+                            <div class="text-center">
+                                <div class="text-sm font-medium text-gray-900 mb-2">{{ $monthStat['display'] }}</div>
+                                <div class="relative pt-1">
+                                    <div class="flex mb-2 items-center justify-between">
+                                        <div>
+                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-{{ $monthStat['percentage'] > 90 ? 'red' : ($monthStat['percentage'] > 75 ? 'yellow' : 'green') }}-600 bg-{{ $monthStat['percentage'] > 90 ? 'red' : ($monthStat['percentage'] > 75 ? 'yellow' : 'green') }}-200">
+                                                {{ number_format($monthStat['percentage'], 0) }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                                        <div style="width:{{ min($monthStat['percentage'], 100) }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-{{ $monthStat['percentage'] > 90 ? 'red' : ($monthStat['percentage'] > 75 ? 'yellow' : 'green') }}-500"></div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-600">
+                                    ${{ number_format($monthStat['spent'], 0) }} / ${{ number_format($monthStat['budgeted'], 0) }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Quick Actions -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
                 <div class="p-6">
@@ -140,12 +259,12 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">{{ $currentMonth }} Budgets</h3>
+                            <h3 class="text-lg font-medium text-gray-900">{{ $selectedMonth }} Budgets</h3>
                             <a href="{{ route('budget-templates.index') }}" class="text-sm text-blue-600 hover:text-blue-900">Manage Templates</a>
                         </div>
-                        @if($currentMonthBudgets->count() > 0)
+                        @if($monthBudgets->count() > 0)
                             <div class="space-y-4">
-                                @foreach($currentMonthBudgets as $budget)
+                                @foreach($monthBudgets as $budget)
                                 <div class="border-l-4 border-blue-400 pl-4">
                                     <div class="flex justify-between">
                                         <h4 class="text-sm font-medium text-gray-900">{{ $budget->name }}</h4>
