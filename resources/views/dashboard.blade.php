@@ -464,24 +464,22 @@
     @endif
 
     <!-- Generate Other Month Modal -->
-    <div id="generateMonthModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Generate Budget for Another Month</h3>
+    <div id="generateMonthModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-80">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Generate Budget</h3>
+            
+            <form method="POST" action="{{ route('budgets.create-from-templates') }}" id="generateMonthForm">
+                @csrf
                 
-                <form method="POST" action="{{ route('budgets.create-from-templates') }}" id="generateMonthForm">
-                    @csrf
-                    
-                    <div class="mb-4">
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
                         <label for="generate_month" class="block text-sm font-medium text-gray-700 mb-1">Month</label>
-                        <select name="month" id="generate_month" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <select name="month" id="generate_month" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
                             @php
-                                $currentMonth = now()->month;
-                                $currentYear = now()->year;
                                 $months = [
-                                    1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
-                                    5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
-                                    9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun',
+                                    7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'
                                 ];
                             @endphp
                             @foreach($months as $num => $month)
@@ -490,39 +488,25 @@
                         </select>
                     </div>
                     
-                    <div class="mb-6">
+                    <div>
                         <label for="generate_year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                        <select name="year" id="generate_year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                            @for($year = $currentYear; $year <= $currentYear + 3; $year++)
+                        <select name="year" id="generate_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
+                            @for($year = now()->year; $year <= now()->year + 3; $year++)
                                 <option value="{{ $year }}">{{ $year }}</option>
                             @endfor
                         </select>
                     </div>
-                    
-                    <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700">
-                                    This will create budgets from your {{ $activeTemplates->count() }} active template{{ $activeTemplates->count() !== 1 ? 's' : '' }} for the selected month.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" onclick="closeGenerateMonthModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                            Cancel
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            Generate Budgets
-                        </button>
-                    </div>
-                </form>
+                </div>
+                
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeGenerateMonthModal()" class="px-3 py-2 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                        Generate
+                    </button>
+                </div>
+            </form>
             </div>
         </div>
     </div>
