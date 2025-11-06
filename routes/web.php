@@ -28,10 +28,24 @@ Route::middleware('auth')->group(function () {
     Route::post('/budget-templates/generate-current-month', [BudgetTemplateController::class, 'generateCurrentMonth'])
         ->name('budget-templates.generate-current-month');
     
-    // Monthly budget management routes
-    Route::resource('budgets', BudgetController::class);
+    // Custom budget routes (must come BEFORE resource routes to avoid conflicts)
     Route::delete('/budgets/month', [BudgetController::class, 'destroyMonth'])
         ->name('budgets.destroy-month');
+    Route::post('/budgets/complete-deletion', [BudgetController::class, 'completeDeletion'])
+        ->name('budgets.complete-deletion');
+    Route::post('/budgets/create-from-templates', [BudgetController::class, 'createFromTemplates'])
+        ->name('budgets.create-from-templates');
+    Route::get('/budgets/select-templates', [BudgetController::class, 'selectTemplates'])
+        ->name('budgets.select-templates');
+    Route::post('/budgets/create-from-selected', [BudgetController::class, 'createFromSelectedTemplates'])
+        ->name('budgets.create-from-selected');
+    Route::get('/budgets/setup', [BudgetController::class, 'setupBudgets'])
+        ->name('budgets.setup');
+    Route::post('/budgets/create-automatic', [BudgetController::class, 'createAutomaticBudgets'])
+        ->name('budgets.create-automatic');
+    
+    // Monthly budget management routes (resource routes come after custom routes)
+    Route::resource('budgets', BudgetController::class);
     
     // Purchase management routes
     Route::resource('purchases', PurchaseController::class);

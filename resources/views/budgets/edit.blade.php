@@ -52,18 +52,43 @@
                         </div>
 
                         <div>
-                            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                            <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $budget->start_date->format('Y-m-d')) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                            @error('start_date')
+                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <select name="month" id="month" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                @for($i = 1; $i <= 12; $i++)
+                                    <option value="{{ $i }}" {{ old('month', $budget->month) == $i ? 'selected' : '' }}>
+                                        {{ DateTime::createFromFormat('!m', $i)->format('F') }}
+                                    </option>
+                                @endfor
+                            </select>
+                            @error('month')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date (Optional)</label>
-                            <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $budget->end_date?->format('Y-m-d')) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <p class="mt-1 text-sm text-gray-500">Leave empty for ongoing budget</p>
-                            @error('end_date')
+                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <input type="number" name="year" id="year" value="{{ old('year', $budget->year) }}" min="2020" max="2050" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                            @error('year')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                            <select name="category" id="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="">Select a category (optional)</option>
+                                <option value="housing" {{ old('category', $budget->category) === 'housing' ? 'selected' : '' }}>Housing</option>
+                                <option value="transportation" {{ old('category', $budget->category) === 'transportation' ? 'selected' : '' }}>Transportation</option>
+                                <option value="food" {{ old('category', $budget->category) === 'food' ? 'selected' : '' }}>Food</option>
+                                <option value="savings" {{ old('category', $budget->category) === 'savings' ? 'selected' : '' }}>Savings</option>
+                                <option value="insurance" {{ old('category', $budget->category) === 'insurance' ? 'selected' : '' }}>Insurance</option>
+                                <option value="debt" {{ old('category', $budget->category) === 'debt' ? 'selected' : '' }}>Debt Payments</option>
+                                <option value="personal" {{ old('category', $budget->category) === 'personal' ? 'selected' : '' }}>Personal/Entertainment</option>
+                                <option value="utilities" {{ old('category', $budget->category) === 'utilities' ? 'selected' : '' }}>Utilities</option>
+                                <option value="miscellaneous" {{ old('category', $budget->category) === 'miscellaneous' ? 'selected' : '' }}>Miscellaneous</option>
+                                <option value="investments" {{ old('category', $budget->category) === 'investments' ? 'selected' : '' }}>Investments</option>
+                            </select>
+                            @error('category')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

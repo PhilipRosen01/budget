@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Budget Dashboard') }} - {{ $selectedMonth }}
+                    Budget Dashboard - {{ $selectedMonth }}
                 </h2>
                 @if($isCurrentMonth)
                     <p class="text-sm text-green-600">Current Month</p>
@@ -167,6 +167,64 @@
                     </div>
                 </div>
             </div>
+            @endif
+
+            <!-- Empty State: No Budgets -->
+            @if($monthBudgets->count() == 0)
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
+                    <div class="p-8 text-center">
+                        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        
+                        @if(!$hasAnyBudgets)
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Welcome to Your Budget Dashboard!</h3>
+                            <p class="text-gray-600 mb-6">You haven't created any budgets yet. Let's start by setting up your monthly budget for {{ $selectedMonth }}.</p>
+                        @else
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Budget for {{ $selectedMonth }}</h3>
+                            <p class="text-gray-600 mb-6">You don't have any budgets set up for this month. Create budgets to start tracking your spending.</p>
+                        @endif
+
+                        @if($activeTemplates->count() > 0)
+                            <div class="flex justify-center">
+                                <a href="{{ route('budgets.setup', ['month' => explode('-', $selectedValue)[0], 'year' => explode('-', $selectedValue)[1]]) }}" class="inline-flex items-center px-8 py-4 bg-indigo-600 border border-transparent rounded-lg font-semibold text-lg text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg">
+                                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                                    </svg>
+                                    Set Up Your Budget
+                                </a>
+                            </div>
+
+                            <div class="mt-6 text-center">
+                                <p class="text-sm text-gray-500 mb-2">Advanced Options:</p>
+                                <div class="flex justify-center space-x-4">
+                                    <a href="{{ route('budgets.create') }}" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Create Individual Budget</a>
+                                    <span class="text-gray-300">|</span>
+                                    <a href="{{ route('budget-templates.create') }}" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Create Templates First</a>
+                                </div>
+                            </div>
+                        @endif
+
+
+                        @if($activeTemplates->count() == 0)
+                            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-yellow-800">No Active Templates</h3>
+                                        <div class="mt-2 text-sm text-yellow-700">
+                                            <p>Create budget templates first to enable auto-population of budgets. <a href="{{ route('budget-templates.create') }}" class="font-medium underline hover:text-yellow-600">Create templates now</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             @endif
 
             <!-- Spending Breakdown by Category -->

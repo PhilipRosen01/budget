@@ -30,8 +30,10 @@ class DashboardController extends Controller
             ->forMonth($selectedMonth, $selectedYear)
             ->get();
         
-        // Generate budgets for current month if none exist and we're viewing current month
-        if ($isCurrentMonth && $monthBudgets->isEmpty() && $user->activeBudgetTemplates->isNotEmpty()) {
+        // Don't auto-generate budgets if we just deleted them (check for success message)
+        // Only auto-generate budgets for current month if none exist and we're viewing current month
+        // and we're not coming from a delete operation
+        if ($isCurrentMonth && $monthBudgets->isEmpty() && $user->activeBudgetTemplates->isNotEmpty() && !session('success')) {
             foreach ($user->activeBudgetTemplates as $template) {
                 $template->createMonthlyBudget($selectedMonth, $selectedYear);
             }
@@ -103,9 +105,13 @@ class DashboardController extends Controller
                 ];
             });
         
+        // Check if this is an empty state (no budgets for any month)
+        $hasAnyBudgets = $user->budgets()->exists();
+        $activeTemplates = $user->activeBudgetTemplates;
+        
         $selectedMonth = $selectedDate->format('F Y');
         $selectedValue = $selectedDate->month . '-' . $selectedDate->year;
         
-        return view('dashboard', compact('monthBudgets', 'recentPurchases', 'budgetStats', 'selectedMonth', 'availableMonths', 'selectedValue', 'isCurrentMonth', 'user', 'purchaseGoals'));
+        return view('dashboard', compact('monthBudgets', 'recentPurchases', 'budgetStats', 'selectedMonth', 'availableMonths', 'selectedValue', 'isCurrentMonth', 'user', 'purchaseGoals', 'hasAnyBudgets', 'activeTemplates'));
     }
 }

@@ -107,6 +107,8 @@ class BudgetController extends Controller
             'amount' => 'required|numeric|min:0',
             'category' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
             'is_active' => 'boolean',
         ]);
 
@@ -143,6 +145,38 @@ class BudgetController extends Controller
         $user = Auth::user();
         $month = $validated['month'];
         $year = $validated['year'];
+        
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+
+        // Store deletion parameters in session for background processing
+        session([
+            'pending_deletion' => [
+                'month' => $month,
+                'year' => $year,
+                'month_name' => $monthName
+            ]
+        ]);
+
+        // Redirect to setup page immediately - this ensures user sees the fresh dashboard
+        $now = Carbon::now();
+        return redirect()->route('budgets.setup', [
+            'month' => $now->month,
+            'year' => $now->year
+        ])->with('info', "Redirecting to budget setup. Deleting {$monthName} budgets...");
+    }
+    
+    public function completeDeletion(Request $request)
+    {
+        $pendingDeletion = session('pending_deletion');
+        
+        if (!$pendingDeletion) {
+            return redirect()->route('dashboard')->with('error', 'No pending deletion found.');
+        }
+        
+        $user = Auth::user();
+        $month = $pendingDeletion['month'];
+        $year = $pendingDeletion['year'];
+        $monthName = $pendingDeletion['month_name'];
 
         // Delete all budgets for this month
         $deletedCount = $user->budgets()
@@ -156,10 +190,12 @@ class BudgetController extends Controller
             ->whereYear('purchase_date', $year)
             ->delete();
 
-        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        // Clear the pending deletion from session
+        session()->forget('pending_deletion');
         
         if ($deletedCount > 0) {
-            return redirect()->route('dashboard')->with('success', "Deleted all budgets for {$monthName} ({$deletedCount} budgets removed).");
+            $message = "Successfully deleted all budgets for {$monthName} ({$deletedCount} budgets removed).";
+            return redirect()->route('dashboard')->with('success', $message);
         } else {
             return redirect()->route('dashboard')->with('info', "No budgets found for {$monthName}.");
         }
@@ -199,5 +235,215 @@ class BudgetController extends Controller
         }
 
         return $months;
+    }
+
+    /**
+     * Create budgets from all active templates for the current month
+     */
+    public function createFromTemplates(Request $request)
+    {
+        $user = Auth::user();
+        $now = Carbon::now();
+        $month = $request->get('month', $now->month);
+        $year = $request->get('year', $now->year);
+        
+        $createdCount = 0;
+        
+        foreach ($user->activeBudgetTemplates as $template) {
+            // Check if budget already exists for this template/month
+            $existingBudget = $template->budgetForMonth($month, $year);
+            
+            if (!$existingBudget) {
+                $template->createMonthlyBudget($month, $year);
+                $createdCount++;
+            }
+        }
+        
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        
+        if ($createdCount > 0) {
+            return redirect()->route('dashboard', ['month-year' => $month . '-' . $year])
+                ->with('success', "Created {$createdCount} budgets for {$monthName} from your active templates!");
+        } else {
+            return redirect()->route('dashboard', ['month-year' => $month . '-' . $year])
+                ->with('info', "All budgets for {$monthName} already exist.");
+        }
+    }
+
+    /**
+     * Show form to manually select templates for budget creation
+     */
+    public function selectTemplates(Request $request)
+    {
+        $user = Auth::user();
+        $now = Carbon::now();
+        $month = $request->get('month', $now->month);
+        $year = $request->get('year', $now->year);
+        
+        $templates = $user->budgetTemplates()->where('is_active', true)->get();
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        
+        // Get which templates already have budgets for this month
+        $existingBudgets = $user->budgets()
+            ->where('month', $month)
+            ->where('year', $year)
+            ->pluck('budget_template_id')
+            ->toArray();
+        
+        return view('budgets.select-templates', compact('templates', 'month', 'year', 'monthName', 'existingBudgets'));
+    }
+
+    /**
+     * Create budgets from selected templates
+     */
+    public function createFromSelectedTemplates(Request $request)
+    {
+        $validated = $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
+            'template_ids' => 'required|array',
+            'template_ids.*' => 'exists:budget_templates,id',
+        ]);
+
+        $user = Auth::user();
+        $month = $validated['month'];
+        $year = $validated['year'];
+        $templateIds = $validated['template_ids'];
+        
+        $createdCount = 0;
+        
+        foreach ($templateIds as $templateId) {
+            $template = $user->budgetTemplates()->find($templateId);
+            
+            if ($template) {
+                // Check if budget already exists
+                $existingBudget = $template->budgetForMonth($month, $year);
+                
+                if (!$existingBudget) {
+                    $template->createMonthlyBudget($month, $year);
+                    $createdCount++;
+                }
+            }
+        }
+        
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        
+        return redirect()->route('dashboard', ['month-year' => $month . '-' . $year])
+            ->with('success', "Created {$createdCount} budgets for {$monthName} from selected templates!");
+    }
+
+    /**
+     * Show enhanced budget setup page with manual/automatic options
+     */
+    public function setupBudgets(Request $request)
+    {
+        $user = Auth::user();
+        $now = Carbon::now();
+        $month = $request->get('month', $now->month);
+        $year = $request->get('year', $now->year);
+        
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        $budgetPreferences = $user->budgetPreferences;
+        $totalSalary = $user->monthly_salary ?? 0;
+        
+        // Get investment amount
+        $investmentAmount = ($budgetPreferences && $budgetPreferences->auto_invest_enabled) 
+            ? (float) $budgetPreferences->monthly_investment_amount 
+            : 0;
+        $availableBudget = $totalSalary - $investmentAmount;
+        
+        // Get all active templates
+        $templates = $user->budgetTemplates()->where('is_active', true)->get();
+        
+        // Get templates that would be used in automatic setup based on preferences
+        $automaticTemplates = $templates;
+        if ($budgetPreferences) {
+            $automaticTemplates = $templates->filter(function($template) use ($budgetPreferences) {
+                return $this->shouldIncludeTemplateInAutomatic($template, $budgetPreferences);
+            });
+        }
+        
+        // Get existing budgets for this month
+        $existingBudgets = $user->budgets()
+            ->where('month', $month)
+            ->where('year', $year)
+            ->pluck('budget_template_id')
+            ->toArray();
+        
+        return view('budgets.setup', compact(
+            'month', 'year', 'monthName', 'totalSalary', 'investmentAmount', 
+            'availableBudget', 'templates', 'automaticTemplates', 'existingBudgets',
+            'budgetPreferences'
+        ));
+    }
+
+    /**
+     * Create budgets automatically based on user preferences
+     */
+    public function createAutomaticBudgets(Request $request)
+    {
+        $validated = $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $user = Auth::user();
+        $month = $validated['month'];
+        $year = $validated['year'];
+        $budgetPreferences = $user->budgetPreferences;
+        
+        if (!$budgetPreferences) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Please set up your budget preferences first.');
+        }
+
+        $createdCount = 0;
+        $templates = $user->budgetTemplates()->where('is_active', true)->get();
+        
+        foreach ($templates as $template) {
+            // Check if this template should be included based on preferences
+            if ($this->shouldIncludeTemplateInAutomatic($template, $budgetPreferences)) {
+                $existingBudget = $template->budgetForMonth($month, $year);
+                
+                if (!$existingBudget) {
+                    $template->createMonthlyBudget($month, $year);
+                    $createdCount++;
+                }
+            }
+        }
+        
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        
+        return redirect()->route('dashboard', ['month-year' => $month . '-' . $year])
+            ->with('success', "Automatically created {$createdCount} budgets for {$monthName} based on your preferences!");
+    }
+
+    /**
+     * Determine if a template should be included in automatic setup based on user preferences
+     */
+    private function shouldIncludeTemplateInAutomatic($template, $budgetPreferences)
+    {
+        $category = strtolower($template->category ?? '');
+        
+        // Check user's preference exemptions
+        switch ($category) {
+            case 'housing':
+                return !$budgetPreferences->no_rent;
+            case 'transportation':
+                return !($budgetPreferences->no_car_payment && $budgetPreferences->no_gas && $budgetPreferences->no_maintenance);
+            case 'food':
+                return !$budgetPreferences->no_groceries;
+            case 'insurance':
+                return !$budgetPreferences->no_insurance;
+            case 'utilities':
+                return !($budgetPreferences->no_phone_payment && $budgetPreferences->no_utilities && $budgetPreferences->no_internet);
+            case 'miscellaneous':
+                return !$budgetPreferences->no_subscriptions;
+            case 'investments':
+                return $budgetPreferences->auto_invest_enabled;
+            default:
+                // Include other categories by default (savings, debt, personal, etc.)
+                return true;
+        }
     }
 }
