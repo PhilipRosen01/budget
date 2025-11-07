@@ -7,25 +7,26 @@
             </div>
         @endif
         
-        <div class="flex justify-between items-center">
-            <div>
+        <!-- Mobile: Stack vertically, Desktop: Side by side -->
+        <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-start lg:space-y-0">
+            <!-- Title Section -->
+            <div class="flex-shrink-0">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     Budget Dashboard - {{ $selectedMonth }}
                 </h2>
                 @if($isCurrentMonth)
-           <p class="text-                <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->ifdif
-
-            <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->0">Current Month</p>
+                    <p class="text-sm text-gray-500 mt-1">Current Month</p>
                 @endif
             </div>
             
-            <!-- Month Selector and Actions -->
-            <div class="flex items-center space-x-4">
+            <!-- Controls Section -->
+            <div class="flex flex-col space-y-3 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-4">
+                <!-- Month Selector -->
                 @if($availableMonths->count() > 0)
-                    <div class="flex items-center space-x-2">
-                        <label for="month-selector" class="text-sm font-medium text-gray-700">View Month:</label>
+                    <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                        <label for="month-selector" class="text-sm font-medium text-gray-700 whitespace-nowrap">View Month:</label>
                         <form method="GET" action="{{ route('dashboard') }}" class="inline">
-                            <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-48 px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-full sm:w-48 px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                                 @foreach($availableMonths as $month)
                                     <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
                                         {{ $month['display'] }}
@@ -36,37 +37,42 @@
                     </div>
                 @endif
                 
-                <!-- Generate Other Month Button -->
-                @if($activeTemplates->count() > 0)
-                    <button type="button" onclick="openGenerateMonthModal()" class="inline-flex items-center px-3 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 mr-2">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Generate Other Month
-                    </button>
-                @endif
-
-                <!-- Delete Month Budget Button -->
-                @if($monthBudgets->count() > 0)
-                    <form method="POST" action="{{ route('budgets.destroy-month') }}" class="inline" onsubmit="return confirm('Are you sure you want to delete ALL budgets and purchases for {{ $selectedMonth }}? This cannot be undone.')">
-                        @csrf
-                        @method('DELETE')
-                        <input type="hidden" name="month" value="{{ explode('-', $selectedValue)[0] }}">
-                        <input type="hidden" name="year" value="{{ explode('-', $selectedValue)[1] }}">
-                        <button type="submit" class="inline-flex items-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <!-- Action Buttons -->
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                    <!-- Generate Other Month Button -->
+                    @if($activeTemplates->count() > 0)
+                        <button type="button" onclick="openGenerateMonthModal()" class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
-                            Delete Month
+                            <span class="hidden sm:inline">Generate Other Month</span>
+                            <span class="sm:hidden">Generate Month</span>
                         </button>
-                    </form>
-                @endif
+                    @endif
+
+                    <!-- Delete Month Budget Button -->
+                    @if($monthBudgets->count() > 0)
+                        <form method="POST" action="{{ route('budgets.destroy-month') }}" class="w-full sm:w-auto" onsubmit="return confirm('Are you sure you want to delete ALL budgets and purchases for {{ $selectedMonth }}? This cannot be undone.')">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="month" value="{{ explode('-', $selectedValue)[0] }}">
+                            <input type="hidden" name="year" value="{{ explode('-', $selectedValue)[1] }}">
+                            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                <span class="hidden sm:inline">Delete Month</span>
+                                <span class="sm:hidden">Delete</span>
+                            </button>
+                        </form>
+                    @endif
+                </div>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Budget Overview Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white overflow-hidden shadow-lg rounded-lg">
