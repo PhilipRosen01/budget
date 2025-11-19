@@ -53,7 +53,7 @@
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 text-lg">$</span>
+                                    <span class="text-gray-500 text-lg font-medium">$</span>
                                 </div>
                                 <input type="number" 
                                        name="monthly_investment_amount" 
@@ -62,8 +62,8 @@
                                        min="0" 
                                        max="{{ $salary }}"
                                        value="{{ old('monthly_investment_amount', $currentInvestment) }}"
-                                       class="block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg" 
-                                       placeholder="500.00"
+                                       class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg" 
+                                       placeholder="Enter amount"
                                        required>
                             </div>
                             @error('monthly_investment_amount')
