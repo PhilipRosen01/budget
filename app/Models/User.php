@@ -23,6 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'monthly_salary',
+        'onboarding_completed',
+        'onboarding_completed_at',
     ];
 
     /**
@@ -46,6 +48,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'monthly_salary' => 'decimal:2',
+            'onboarding_completed' => 'boolean',
+            'onboarding_completed_at' => 'datetime',
         ];
     }
 
