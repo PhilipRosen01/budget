@@ -45,23 +45,18 @@
                         <!-- Salary Input -->
                         <div>
                             <label for="monthly_salary" class="block text-sm font-medium text-gray-700 mb-2">
-                                Monthly Take-Home Pay
+                                Monthly Take-Home Pay ($)
                             </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 text-lg font-medium">$</span>
-                                </div>
-                                <input type="number" 
-                                       name="monthly_salary" 
-                                       id="monthly_salary" 
-                                       step="0.01" 
-                                       min="0" 
-                                       max="999999.99"
-                                       value="{{ old('monthly_salary', $currentSalary) }}"
-                                       class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg @error('monthly_salary') border-red-300 @enderror" 
-                                       placeholder="Enter amount"
-                                       required>
-                            </div>
+                            <input type="number" 
+                                   name="monthly_salary" 
+                                   id="monthly_salary" 
+                                   step="0.01" 
+                                   min="0" 
+                                   max="999999.99"
+                                   value="{{ old('monthly_salary', $currentSalary) }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg @error('monthly_salary') border-red-300 @enderror" 
+                                   placeholder="Enter amount (e.g., 3000.00)"
+                                   required>
                             @error('monthly_salary')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror

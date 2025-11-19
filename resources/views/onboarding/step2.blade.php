@@ -49,23 +49,18 @@
                         <!-- Investment Amount -->
                         <div>
                             <label for="monthly_investment_amount" class="block text-sm font-medium text-gray-700 mb-2">
-                                Monthly Investment/Savings Amount
+                                Monthly Investment/Savings Amount ($)
                             </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 text-lg font-medium">$</span>
-                                </div>
-                                <input type="number" 
-                                       name="monthly_investment_amount" 
-                                       id="monthly_investment_amount" 
-                                       step="0.01" 
-                                       min="0" 
-                                       max="{{ $salary }}"
-                                       value="{{ old('monthly_investment_amount', $currentInvestment) }}"
-                                       class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg" 
-                                       placeholder="Enter amount"
-                                       required>
-                            </div>
+                            <input type="number" 
+                                   name="monthly_investment_amount" 
+                                   id="monthly_investment_amount" 
+                                   step="0.01" 
+                                   min="0" 
+                                   max="{{ $salary }}"
+                                   value="{{ old('monthly_investment_amount', $currentInvestment) }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg" 
+                                   placeholder="Enter amount (e.g., 500.00)"
+                                   required>
                             @error('monthly_investment_amount')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
