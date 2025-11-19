@@ -8,7 +8,29 @@ use App\Http\Controllers\BudgetPreferenceController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseGoalController;
 use App\Http\Controllers\OnboardingController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/debug-onboarding', function () {
+    $user = Auth::user();
+    if (!$user) {
+        return 'Not authenticated';
+    }
+    
+    $dbStatus = DB::table('users')
+        ->where('id', $user->id)
+        ->first();
+    
+    return [
+        'user_id' => $user->id,
+        'model_onboarding_completed' => $user->onboarding_completed,
+        'model_type' => gettype($user->onboarding_completed),
+        'db_onboarding_completed' => $dbStatus->onboarding_completed,
+        'db_type' => gettype($dbStatus->onboarding_completed),
+        'db_onboarding_completed_at' => $dbStatus->onboarding_completed_at,
+    ];
+})->middleware('auth');
 
 Route::get('/', function () {
     return view('welcome');
