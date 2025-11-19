@@ -58,7 +58,7 @@
                                        min="0" 
                                        max="999999.99"
                                        value="{{ old('monthly_salary', $currentSalary) }}"
-                                       class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg @error('monthly_salary') border-red-300 @enderror" 
+                                       class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg @error('monthly_salary') border-red-300 @enderror" 
                                        placeholder="Enter amount"
                                        required>
                             </div>

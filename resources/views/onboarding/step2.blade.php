@@ -62,7 +62,7 @@
                                        min="0" 
                                        max="{{ $salary }}"
                                        value="{{ old('monthly_investment_amount', $currentInvestment) }}"
-                                       class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg" 
+                                       class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg" 
                                        placeholder="Enter amount"
                                        required>
                             </div>
