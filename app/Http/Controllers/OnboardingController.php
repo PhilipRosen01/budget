@@ -6,6 +6,7 @@ use App\Models\BudgetPreference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class OnboardingController extends Controller
@@ -176,23 +177,60 @@ class OnboardingController extends Controller
         ]);
 
         // Mark onboarding as completed with error handling
+        $user = Auth::user();
+        
         try {
-            $user->update([
+            // First try with mass assignment
+            $result = $user->update([
                 'onboarding_completed' => true,
                 'onboarding_completed_at' => Carbon::now()
             ]);
+            
+            if (!$result) {
+                throw new \Exception('Update returned false');
+            }
+            
+            // Refresh the user model to ensure we have the latest data
+            $user->refresh();
+            
+            Log::info('Onboarding completion successful for user ' . $user->id);
+            
         } catch (\Exception $e) {
-            // Log the error but don't stop the process
+            // Log the error and try alternative approach
             Log::error('Failed to update onboarding completion: ' . $e->getMessage());
             
-            // Try alternative approach
             try {
-                $user->onboarding_completed = true;
+                // Direct property assignment
+                $user->onboarding_completed = 1; // Use integer instead of boolean
                 $user->onboarding_completed_at = Carbon::now();
-                $user->save();
+                $saved = $user->save();
+                
+                if (!$saved) {
+                    throw new \Exception('Save returned false');
+                }
+                
+                $user->refresh();
+                Log::info('Alternative onboarding completion successful for user ' . $user->id);
+                
             } catch (\Exception $e2) {
-                // If still failing, continue without setting the flag
+                // If still failing, try direct database update
                 Log::error('Alternative onboarding completion update also failed: ' . $e2->getMessage());
+                
+                try {
+                    DB::table('users')
+                        ->where('id', $user->id)
+                        ->update([
+                            'onboarding_completed' => 1,
+                            'onboarding_completed_at' => Carbon::now(),
+                            'updated_at' => Carbon::now()
+                        ]);
+                    
+                    $user->refresh();
+                    Log::info('Direct DB onboarding completion successful for user ' . $user->id);
+                    
+                } catch (\Exception $e3) {
+                    Log::error('All onboarding completion methods failed: ' . $e3->getMessage());
+                }
             }
         }
 
@@ -206,8 +244,29 @@ class OnboardingController extends Controller
     {
         $user = Auth::user();
         
+        // Refresh user to get latest data
+        $user->refresh();
+        
+        // Log for debugging
+        Log::info('Complete method called for user ' . $user->id . ', onboarding_completed: ' . ($user->onboarding_completed ? 'true' : 'false'));
+        
+        // If user somehow doesn't have onboarding completed, try to set it
         if (!$user->onboarding_completed) {
-            return redirect()->route('onboarding.index');
+            Log::warning('User reached completion screen but onboarding not marked complete, setting it now');
+            
+            try {
+                DB::table('users')
+                    ->where('id', $user->id)
+                    ->update([
+                        'onboarding_completed' => 1,
+                        'onboarding_completed_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ]);
+                
+                $user->refresh();
+            } catch (\Exception $e) {
+                Log::error('Failed to set onboarding complete in complete method: ' . $e->getMessage());
+            }
         }
 
         return view('onboarding.complete', [

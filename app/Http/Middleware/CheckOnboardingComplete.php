@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
 
 class CheckOnboardingComplete
 {
@@ -18,14 +19,10 @@ class CheckOnboardingComplete
         // Only check for authenticated users
         if ($request->user()) {
             try {
-                $onboardingCompleted = $request->user()->onboarding_completed;
-            } catch (\Exception $e) {
-                // If there's a database error checking onboarding status, allow access
-                // This prevents users from being locked out due to column issues
-                return $next($request);
-            }
-            
-            if (!$onboardingCompleted) {
+                // Refresh user to get latest data from database
+                $user = $request->user();
+                $user->refresh();
+                
                 // Allow access to onboarding routes, logout, and API routes
                 $allowedRoutes = [
                     'onboarding.*',
@@ -39,9 +36,20 @@ class CheckOnboardingComplete
                         return $next($request);
                     }
                 }
-
-                // Redirect to onboarding if not completed
-                return redirect()->route('onboarding.index');
+                
+                // Get the onboarding status
+                $onboardingCompleted = $user->onboarding_completed;
+                
+                // Use explicit boolean check - anything that's not explicitly true should redirect
+                if ($onboardingCompleted !== true && $onboardingCompleted !== 1) {
+                    return redirect()->route('onboarding.index');
+                }
+                
+            } catch (\Exception $e) {
+                // If there's a database error checking onboarding status, allow access
+                // This prevents users from being locked out due to column issues
+                Log::error('Error checking onboarding status: ' . $e->getMessage());
+                return $next($request);
             }
         }
 
