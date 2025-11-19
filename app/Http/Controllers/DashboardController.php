@@ -93,8 +93,8 @@ class DashboardController extends Controller
             'available_budget' => $availableBudget,
             'total_budget' => $totalBudgetAllocated > 0 ? $totalBudgetAllocated : $availableBudget,
             'total_spent' => $monthlySpending,
-            'remaining' => $totalBudgetAllocated - $monthlySpending,
-            'percentage_used' => $totalBudgetAllocated > 0 ? ($monthlySpending / $totalBudgetAllocated) * 100 : 0,
+            'remaining' => $availableBudget - $monthlySpending,
+            'percentage_used' => $availableBudget > 0 ? ($monthlySpending / $availableBudget) * 100 : 0,
         ];
         
         // Get purchase goals
