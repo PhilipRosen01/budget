@@ -199,7 +199,7 @@
     <script>
         function previewTemplates() {
             fetch('{{ route("budget-preferences.preview-templates") }}', {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')

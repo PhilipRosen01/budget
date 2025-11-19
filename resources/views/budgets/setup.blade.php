@@ -203,13 +203,20 @@
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <div>
+                            <div class="flex items-center space-x-4">
                                 <button type="button" id="select-all-manual" class="text-sm text-green-600 hover:text-green-500 font-medium">
                                     Select All Available
                                 </button>
-                                <span class="mx-2 text-gray-300">|</span>
+                                <span class="text-gray-300">|</span>
                                 <button type="button" id="select-none-manual" class="text-sm text-green-600 hover:text-green-500 font-medium">
                                     Select None
+                                </button>
+                                <span class="text-gray-300">|</span>
+                                <button type="button" id="smart-distribute" class="text-sm text-purple-600 hover:text-purple-500 font-medium">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Smart Distribute
                                 </button>
                             </div>
                             
@@ -222,6 +229,9 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Hidden fields for adjusted amounts -->
+                        <div id="adjusted-amounts-container"></div>
                     </form>
                 </div>
             </div>
@@ -241,6 +251,7 @@
             const templateCheckboxes = document.querySelectorAll('.template-checkbox:not(:disabled)');
             const selectAllBtn = document.getElementById('select-all-manual');
             const selectNoneBtn = document.getElementById('select-none-manual');
+            const smartDistributeBtn = document.getElementById('smart-distribute');
             const createBtn = document.getElementById('create-manual-budgets');
 
             // Display elements
@@ -267,12 +278,24 @@
                 totalAllocated = 0;
                 selectedCount = 0;
 
+                // Clear existing hidden fields
+                const container = document.getElementById('adjusted-amounts-container');
+                container.innerHTML = '';
+
                 templateCheckboxes.forEach(checkbox => {
                     if (checkbox.checked) {
                         const templateItem = checkbox.closest('.template-item');
+                        const templateId = templateItem.dataset.templateId;
                         const amount = parseFloat(templateItem.dataset.amount);
                         totalAllocated += amount;
                         selectedCount++;
+
+                        // Add hidden field for adjusted amount
+                        const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = `template_amounts[${templateId}]`;
+                        hiddenField.value = amount;
+                        container.appendChild(hiddenField);
                     }
                 });
 
@@ -321,6 +344,80 @@
 
             selectNoneBtn.addEventListener('click', () => {
                 templateCheckboxes.forEach(cb => cb.checked = false);
+                updateBudgetCalculations();
+            });
+
+            // Smart distribute functionality
+            smartDistributeBtn.addEventListener('click', () => {
+                // Get all checked templates
+                const checkedTemplates = [];
+                templateCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const templateItem = checkbox.closest('.template-item');
+                        const originalAmount = parseFloat(templateItem.dataset.amount);
+                        checkedTemplates.push({
+                            checkbox: checkbox,
+                            templateItem: templateItem,
+                            originalAmount: originalAmount
+                        });
+                    }
+                });
+
+                if (checkedTemplates.length === 0) {
+                    alert('Please select at least one template to distribute.');
+                    return;
+                }
+
+                // Calculate total original amounts and proportions
+                const totalOriginal = checkedTemplates.reduce((sum, template) => sum + template.originalAmount, 0);
+                const availableBudget = totalSalary - {{ $investmentAmount ?? 0 }};
+                
+                if (totalOriginal === 0) return;
+
+                // Distribute proportionally
+                let totalDistributed = 0;
+                checkedTemplates.forEach((template, index) => {
+                    const proportion = template.originalAmount / totalOriginal;
+                    let newAmount;
+                    
+                    if (index === checkedTemplates.length - 1) {
+                        // Last template gets the remainder to avoid rounding errors
+                        newAmount = availableBudget - totalDistributed;
+                    } else {
+                        newAmount = availableBudget * proportion;
+                        totalDistributed += newAmount;
+                    }
+
+                    // Update the displayed amount
+                    const amountDisplay = template.templateItem.querySelector('.text-lg.font-semibold:last-child');
+                    if (amountDisplay) {
+                        amountDisplay.textContent = '$' + newAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    }
+                    
+                    // Update the data attribute for calculations
+                    template.templateItem.dataset.amount = newAmount.toFixed(2);
+                });
+
+                // Add a visual indicator that amounts have been adjusted
+                if (!document.querySelector('.smart-distribute-notice')) {
+                    const notice = document.createElement('div');
+                    notice.className = 'smart-distribute-notice bg-purple-50 border border-purple-200 rounded-lg p-3 mb-4';
+                    notice.innerHTML = `
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm text-purple-800 font-medium">Smart Distribution Applied</p>
+                                <p class="text-xs text-purple-600">Template amounts have been proportionally adjusted to fit your available budget of $${availableBudget.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const form = document.getElementById('manual-setup-form');
+                    form.insertBefore(notice, form.querySelector('.grid'));
+                }
+
                 updateBudgetCalculations();
             });
 

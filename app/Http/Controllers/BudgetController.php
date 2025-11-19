@@ -302,12 +302,15 @@ class BudgetController extends Controller
             'year' => 'required|integer|min:2000|max:2100',
             'template_ids' => 'required|array',
             'template_ids.*' => 'exists:budget_templates,id',
+            'template_amounts' => 'sometimes|array',
+            'template_amounts.*' => 'numeric|min:0',
         ]);
 
         $user = Auth::user();
         $month = $validated['month'];
         $year = $validated['year'];
         $templateIds = $validated['template_ids'];
+        $templateAmounts = $validated['template_amounts'] ?? [];
         
         $createdCount = 0;
         
@@ -319,7 +322,21 @@ class BudgetController extends Controller
                 $existingBudget = $template->budgetForMonth($month, $year);
                 
                 if (!$existingBudget) {
-                    $template->createMonthlyBudget($month, $year);
+                    // Use adjusted amount if provided, otherwise use template amount
+                    $budgetAmount = $templateAmounts[$templateId] ?? $template->amount;
+                    
+                    // Create budget with custom amount if different from template
+                    $budget = $user->budgets()->create([
+                        'budget_template_id' => $template->id,
+                        'name' => $template->name,
+                        'amount' => $budgetAmount,
+                        'description' => $template->description,
+                        'category' => $template->category,
+                        'month' => $month,
+                        'year' => $year,
+                        'is_active' => true,
+                    ]);
+                    
                     $createdCount++;
                 }
             }

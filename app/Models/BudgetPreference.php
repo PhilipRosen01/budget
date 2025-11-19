@@ -154,10 +154,20 @@ class BudgetPreference extends Model
         $percentages = $this->getAdjustedPercentages();
         $templates = [];
 
-        // Generate regular budget templates based on FULL SALARY (investment is separate)
+        // Calculate available budget after investment allocation
+        $investmentAmount = $this->auto_invest_enabled ? (float) $this->monthly_investment_amount : 0;
+        $availableForBudgets = $monthlySalary - $investmentAmount;
+
+        // Ensure we don't have negative available budget
+        if ($availableForBudgets <= 0) {
+            $availableForBudgets = $monthlySalary * 0.1; // Use 10% as minimum for basic needs
+            $investmentAmount = $monthlySalary - $availableForBudgets; // Reduce investment accordingly
+        }
+
+        // Generate regular budget templates based on AVAILABLE BUDGET (after investment)
         foreach ($percentages as $category => $percentage) {
             if ($percentage > 0) {
-                $amount = ($monthlySalary * $percentage) / 100;
+                $amount = ($availableForBudgets * $percentage) / 100;
                 $templates[] = [
                     'name' => ucfirst($category),
                     'category' => $category,
