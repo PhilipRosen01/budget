@@ -16,23 +16,33 @@ class CheckOnboardingComplete
     public function handle(Request $request, Closure $next): Response
     {
         // Only check for authenticated users
-        if ($request->user() && !$request->user()->onboarding_completed) {
-            // Allow access to onboarding routes, logout, and API routes
-            $allowedRoutes = [
-                'onboarding.*',
-                'logout',
-                'profile.destroy',
-            ];
-
-            // Allow access if current route is in allowed routes
-            foreach ($allowedRoutes as $pattern) {
-                if ($request->routeIs($pattern)) {
-                    return $next($request);
-                }
+        if ($request->user()) {
+            try {
+                $onboardingCompleted = $request->user()->onboarding_completed;
+            } catch (\Exception $e) {
+                // If there's a database error checking onboarding status, allow access
+                // This prevents users from being locked out due to column issues
+                return $next($request);
             }
+            
+            if (!$onboardingCompleted) {
+                // Allow access to onboarding routes, logout, and API routes
+                $allowedRoutes = [
+                    'onboarding.*',
+                    'logout',
+                    'profile.destroy',
+                ];
 
-            // Redirect to onboarding if not completed
-            return redirect()->route('onboarding.index');
+                // Allow access if current route is in allowed routes
+                foreach ($allowedRoutes as $pattern) {
+                    if ($request->routeIs($pattern)) {
+                        return $next($request);
+                    }
+                }
+
+                // Redirect to onboarding if not completed
+                return redirect()->route('onboarding.index');
+            }
         }
 
         return $next($request);

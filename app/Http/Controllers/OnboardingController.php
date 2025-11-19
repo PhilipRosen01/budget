@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BudgetPreference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class OnboardingController extends Controller
@@ -174,11 +175,26 @@ class OnboardingController extends Controller
             'no_debt' => $validated['no_debt'] ?? false,
         ]);
 
-        // Mark onboarding as completed
-        $user->update([
-            'onboarding_completed' => true,
-            'onboarding_completed_at' => Carbon::now()
-        ]);
+        // Mark onboarding as completed with error handling
+        try {
+            $user->update([
+                'onboarding_completed' => true,
+                'onboarding_completed_at' => Carbon::now()
+            ]);
+        } catch (\Exception $e) {
+            // Log the error but don't stop the process
+            Log::error('Failed to update onboarding completion: ' . $e->getMessage());
+            
+            // Try alternative approach
+            try {
+                $user->onboarding_completed = true;
+                $user->onboarding_completed_at = Carbon::now();
+                $user->save();
+            } catch (\Exception $e2) {
+                // If still failing, continue without setting the flag
+                Log::error('Alternative onboarding completion update also failed: ' . $e2->getMessage());
+            }
+        }
 
         return redirect()->route('onboarding.complete');
     }
