@@ -78,7 +78,7 @@
                                 Check all that apply to your situation. These categories won't appear in your automatic budget templates.
                             </p>
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <!-- Housing -->
                                 <div class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                                     <input type="checkbox" 
@@ -130,16 +130,80 @@
                                 <!-- Phone -->
                                 <div class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                                     <input type="checkbox" 
-                                           name="no_phone_bill" 
-                                           id="no_phone_bill" 
+                                           name="no_phone_payment" 
+                                           id="no_phone_payment" 
                                            value="1"
-                                           {{ old('no_phone_bill', $preferences->no_phone_bill ?? false) ? 'checked' : '' }}
+                                           {{ old('no_phone_payment', $preferences->no_phone_payment ?? false) ? 'checked' : '' }}
                                            class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
                                     <div class="flex-1">
-                                        <label for="no_phone_bill" class="text-sm font-medium text-gray-900 cursor-pointer">
+                                        <label for="no_phone_payment" class="text-sm font-medium text-gray-900 cursor-pointer">
                                             📱 Phone Bill
                                         </label>
                                         <p class="text-sm text-gray-500">Family plan, work provides, or don't have a phone</p>
+                                    </div>
+                                </div>
+
+                                <!-- Groceries -->
+                                <div class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" 
+                                           name="no_groceries" 
+                                           id="no_groceries" 
+                                           value="1"
+                                           {{ old('no_groceries', $preferences->no_groceries ?? false) ? 'checked' : '' }}
+                                           class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                    <div class="flex-1">
+                                        <label for="no_groceries" class="text-sm font-medium text-gray-900 cursor-pointer">
+                                            🛒 Groceries
+                                        </label>
+                                        <p class="text-sm text-gray-500">Meals provided by work/family or shared grocery costs</p>
+                                    </div>
+                                </div>
+
+                                <!-- Gas/Fuel -->
+                                <div class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" 
+                                           name="no_gas" 
+                                           id="no_gas" 
+                                           value="1"
+                                           {{ old('no_gas', $preferences->no_gas ?? false) ? 'checked' : '' }}
+                                           class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                    <div class="flex-1">
+                                        <label for="no_gas" class="text-sm font-medium text-gray-900 cursor-pointer">
+                                            ⛽ Gas/Fuel
+                                        </label>
+                                        <p class="text-sm text-gray-500">No car, electric vehicle, or employer-provided fuel</p>
+                                    </div>
+                                </div>
+
+                                <!-- Car Maintenance -->
+                                <div class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" 
+                                           name="no_maintenance" 
+                                           id="no_maintenance" 
+                                           value="1"
+                                           {{ old('no_maintenance', $preferences->no_maintenance ?? false) ? 'checked' : '' }}
+                                           class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                    <div class="flex-1">
+                                        <label for="no_maintenance" class="text-sm font-medium text-gray-900 cursor-pointer">
+                                            🔧 Car Maintenance
+                                        </label>
+                                        <p class="text-sm text-gray-500">No car, warranty coverage, or maintenance included</p>
+                                    </div>
+                                </div>
+
+                                <!-- Subscriptions -->
+                                <div class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <input type="checkbox" 
+                                           name="no_subscriptions" 
+                                           id="no_subscriptions" 
+                                           value="1"
+                                           {{ old('no_subscriptions', $preferences->no_subscriptions ?? false) ? 'checked' : '' }}
+                                           class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                    <div class="flex-1">
+                                        <label for="no_subscriptions" class="text-sm font-medium text-gray-900 cursor-pointer">
+                                            📺 Subscriptions
+                                        </label>
+                                        <p class="text-sm text-gray-500">No streaming services, software subscriptions, or memberships</p>
                                     </div>
                                 </div>
 

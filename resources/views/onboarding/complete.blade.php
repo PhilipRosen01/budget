@@ -19,6 +19,7 @@
                     </h1>
                     <p class="text-lg text-gray-600 mb-8">
                         Great job! Your account is now personalized and ready to help you manage your finances effectively.
+                        We've automatically created budget templates based on your preferences to get you started!
                     </p>
 
                     <!-- Summary of Setup -->
@@ -76,11 +77,11 @@
                         <div class="text-center">
                             <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <h3 class="font-semibold text-gray-900 mb-1">Create Budget Templates</h3>
-                            <p class="text-sm text-gray-500">Set up reusable budget categories for each month</p>
+                            <h3 class="font-semibold text-gray-900 mb-1">Budget Templates Created</h3>
+                            <p class="text-sm text-gray-500">We've automatically generated budget templates based on your preferences</p>
                         </div>
                     </div>
 
@@ -100,10 +101,10 @@
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
                         <h3 class="text-sm font-medium text-blue-800 mb-2">💡 Pro Tips for Getting Started:</h3>
                         <ul class="text-sm text-blue-700 space-y-1">
-                            <li>• Start by creating budget templates for your regular expenses</li>
+                            <li>• Your budget templates have been automatically created and are ready to use</li>
                             <li>• Add purchases as you make them to track spending in real-time</li>
                             <li>• Review your monthly spending patterns to optimize your budget</li>
-                            <li>• You can always adjust your salary and investment settings in preferences</li>
+                            <li>• You can always adjust your salary and preferences in account settings</li>
                         </ul>
                     </div>
                 </div>

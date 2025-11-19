@@ -31,9 +31,13 @@
                     <!-- Responsive Info Section -->
                     <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
                         <div class="flex-1">
-                            <h3 class="text-lg font-medium text-gray-900">What are Budget Templates?</h3>
+                            <h3 class="text-lg font-medium text-gray-900">Budget Templates Explained</h3>
                             <p class="text-sm text-gray-600 mt-1">
-                                Templates define your standard monthly budgets. Each month, budgets are automatically created from your active templates.
+                                <strong>Templates</strong> are your budget patterns that repeat each month (like rent, groceries, etc.). 
+                                <strong>Monthly Budgets</strong> are the actual budgets created from your templates for specific months where you track spending.
+                            </p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                💡 Think of templates as cookie cutters and monthly budgets as the actual cookies!
                             </p>
                         </div>
                         <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 lg:flex-shrink-0">
@@ -61,6 +65,49 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Auto-Generate Templates Section -->
+            @if(Auth::user()->hasMonthlySalary())
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                    <div class="p-4 sm:p-6">
+                        <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    Smart Template Generator
+                                </h3>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Let us automatically create budget templates based on your ${{ number_format(Auth::user()->monthly_salary, 0) }} monthly salary and spending preferences.
+                                    This replaces manual template creation with intelligent budgeting based on your lifestyle.
+                                </p>
+                                <p class="text-xs text-purple-600 mt-1">
+                                    💡 Generated templates respect your "expenses you don't pay for" settings and allocate your money intelligently!
+                                </p>
+                            </div>
+                            <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
+                                <button type="button" onclick="previewTemplates()" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    Preview
+                                </button>
+                                <form action="{{ route('budget-preferences.generate-templates') }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" onclick="return confirm('This will replace your existing automatic templates with new ones based on your current preferences. Continue?')" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                        Generate Smart Templates
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             @if($templates->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -148,4 +195,100 @@
             @endif
         </div>
     </div>
+
+    <script>
+        function previewTemplates() {
+            fetch('{{ route("budget-preferences.preview-templates") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+
+                let previewContent = `
+                    <div class="space-y-3">
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Preview of Smart Templates</h3>
+                        <p class="text-sm text-gray-600 mb-4">These templates will be created based on your preferences:</p>
+                `;
+
+                data.templates.forEach(template => {
+                    previewContent += `
+                        <div class="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
+                            <div>
+                                <span class="font-medium text-gray-900">${template.name}</span>
+                                <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    ${template.category}
+                                </span>
+                            </div>
+                            <span class="font-semibold text-green-600">$${parseFloat(template.amount).toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+
+                previewContent += `
+                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <p class="text-sm text-blue-700">
+                                💡 These templates will replace any existing automatic templates but keep your manually created ones.
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                // Create modal-like alert with better formatting
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    max-width: 500px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    border-radius: 8px;
+                    padding: 20px;
+                    margin: 20px;
+                `;
+
+                modalContent.innerHTML = previewContent + `
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="this.closest('[style*=fixed]').remove()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                            Close
+                        </button>
+                    </div>
+                `;
+
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                // Close on background click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading preview. Please try again.');
+            });
+        }
+    </script>
 </x-app-layout>

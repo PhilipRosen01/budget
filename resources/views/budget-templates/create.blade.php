@@ -15,9 +15,13 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="mb-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">Create Budget Template</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Create a New Budget Template</h3>
                         <p class="text-sm text-gray-600">
-                            Templates define your standard monthly budgets. Once created, this template will automatically generate a budget for the current month and can be used to generate budgets for future months.
+                            Create a reusable budget pattern for expenses that repeat monthly. For example, if you budget $400 for groceries each month, 
+                            create a "Groceries" template for $400. This template will automatically create a $400 grocery budget each month.
+                        </p>
+                        <p class="text-xs text-blue-600 mt-1">
+                            💡 After saving, we'll automatically create this month's budget from your template so you can start tracking spending right away!
                         </p>
                     </div>
 

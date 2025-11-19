@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BudgetPreference;
+use App\Models\BudgetTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -152,7 +153,11 @@ class OnboardingController extends Controller
             'no_rent' => 'boolean',
             'no_car_payment' => 'boolean', 
             'no_insurance' => 'boolean',
-            'no_phone_bill' => 'boolean',
+            'no_phone_payment' => 'boolean',
+            'no_groceries' => 'boolean',
+            'no_gas' => 'boolean',
+            'no_maintenance' => 'boolean',
+            'no_subscriptions' => 'boolean',
             'no_internet' => 'boolean',
             'no_utilities' => 'boolean',
             'no_debt' => 'boolean',
@@ -170,11 +175,24 @@ class OnboardingController extends Controller
             'no_rent' => $validated['no_rent'] ?? false,
             'no_car_payment' => $validated['no_car_payment'] ?? false,
             'no_insurance' => $validated['no_insurance'] ?? false,
-            'no_phone_bill' => $validated['no_phone_bill'] ?? false,
+            'no_phone_payment' => $validated['no_phone_payment'] ?? false,
+            'no_groceries' => $validated['no_groceries'] ?? false,
+            'no_gas' => $validated['no_gas'] ?? false,
+            'no_maintenance' => $validated['no_maintenance'] ?? false,
+            'no_subscriptions' => $validated['no_subscriptions'] ?? false,
             'no_internet' => $validated['no_internet'] ?? false,
             'no_utilities' => $validated['no_utilities'] ?? false,
             'no_debt' => $validated['no_debt'] ?? false,
         ]);
+
+        // Generate automatic budget templates based on preferences
+        try {
+            $this->generateAutomaticTemplates($user);
+            Log::info('Successfully generated automatic templates for user ' . $user->id);
+        } catch (\Exception $e) {
+            Log::error('Failed to generate automatic templates for user ' . $user->id . ': ' . $e->getMessage());
+            // Don't fail onboarding if template generation fails
+        }
 
         // Mark onboarding as completed with error handling
         $user = Auth::user();
@@ -280,5 +298,75 @@ class OnboardingController extends Controller
     public function toDashboard()
     {
         return redirect()->route('dashboard');
+    }
+
+    /**
+     * Generate automatic budget templates for the user during onboarding
+     */
+    private function generateAutomaticTemplates($user)
+    {
+        if (!$user->hasMonthlySalary()) {
+            throw new \Exception('User does not have monthly salary set');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Generate template data using the User model method
+            $templateData = $user->generateAutomaticBudgetTemplates();
+
+            // Delete existing automatic templates (ones that were auto-generated)
+            $user->budgetTemplates()
+                ->where('is_automatic', true)
+                ->delete();
+
+            // Create new automatic templates
+            $createdTemplates = [];
+            foreach ($templateData as $template) {
+                $createdTemplate = $user->budgetTemplates()->create([
+                    'name' => $template['name'],
+                    'category' => $template['category'],
+                    'amount' => $template['amount'],
+                    'description' => $template['description'],
+                    'is_active' => true,
+                    'is_automatic' => true, // Flag to identify auto-generated templates
+                ]);
+                
+                // Create budget for current month
+                $currentMonth = Carbon::now();
+                $createdTemplate->createMonthlyBudget($currentMonth->month, $currentMonth->year);
+                
+                $createdTemplates[] = $createdTemplate;
+            }
+
+            // Create investment template separately if enabled
+            $preferences = $user->getOrCreateBudgetPreferences();
+            $investmentAllocation = $preferences->getInvestmentAllocation();
+            if ($investmentAllocation) {
+                $investmentTemplate = $user->budgetTemplates()->create([
+                    'name' => $investmentAllocation['name'],
+                    'category' => $investmentAllocation['category'],
+                    'amount' => $investmentAllocation['amount'],
+                    'description' => $investmentAllocation['description'],
+                    'is_active' => true,
+                    'is_automatic' => true,
+                ]);
+                
+                // Create budget for current month
+                $currentMonth = Carbon::now();
+                $investmentTemplate->createMonthlyBudget($currentMonth->month, $currentMonth->year);
+                
+                $createdTemplates[] = $investmentTemplate;
+            }
+
+            DB::commit();
+
+            Log::info('Generated ' . count($createdTemplates) . ' automatic templates for user ' . $user->id);
+            return $createdTemplates;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 }
