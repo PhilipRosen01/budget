@@ -51,74 +51,133 @@
         </header>
         <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
             <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
-                <div class="text-[13px] leading-[20px] flex-1 p-6 pb-12 lg:p-20 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
-                    <h1 class="mb-1 font-medium">Let's get started</h1>
-                    <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">Laravel has an incredibly rich ecosystem. <br>We suggest starting with the following.</p>
-                    <ul class="flex flex-col mb-4 lg:mb-6">
-                        <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:top-1/2 before:bottom-0 before:left-[0.4rem] before:absolute">
-                            <span class="relative py-1 bg-white dark:bg-[#161615]">
-                                <span class="flex items-center justify-center rounded-full bg-[#FDFDFC] dark:bg-[#161615] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] w-3.5 h-3.5 border dark:border-[#3E3E3A] border-[#e3e3e0]">
-                                    <span class="rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A] w-1.5 h-1.5"></span>
-                                </span>
-                            </span>
-                            <span>
-                                Read the
-                                <a href="https://laravel.com/docs" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Documentation</span>
-                                    <svg
-                                        width="10"
-                                        height="11"
-                                        viewBox="0 0 10 11"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-2.5 h-2.5"
-                                    >
-                                        <path
-                                            d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                            stroke="currentColor"
-                                            stroke-linecap="square"
-                                        />
+                <div class="text-base flex-1 p-8 lg:p-20 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
+                    <div class="mb-8">
+                        <h1 class="text-4xl lg:text-5xl font-bold text-[#1b1b18] dark:text-[#EDEDEC] mb-4 leading-tight">
+                            Budget
+                        </h1>
+                        <p class="text-lg text-[#706f6c] dark:text-[#A1A09A] mb-6 leading-relaxed">
+                            Take control of your finances with smart budgeting tools designed to help you save, spend wisely, and reach your financial goals.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC] mb-4">
+                            Why Choose Budget?
+                        </h2>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3">
+                                <div class="flex-shrink-0 w-6 h-6 bg-emerald-100 dark:bg-emerald-900 rounded-full flex items-center justify-center mt-0.5">
+                                    <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                     </svg>
-                                </a>
-                            </span>
-                        </li>
-                        <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:bottom-1/2 before:top-0 before:left-[0.4rem] before:absolute">
-                            <span class="relative py-1 bg-white dark:bg-[#161615]">
-                                <span class="flex items-center justify-center rounded-full bg-[#FDFDFC] dark:bg-[#161615] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] w-3.5 h-3.5 border dark:border-[#3E3E3A] border-[#e3e3e0]">
-                                    <span class="rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A] w-1.5 h-1.5"></span>
+                                </div>
+                                <span class="text-[#706f6c] dark:text-[#A1A09A]">
+                                    <strong class="text-[#1b1b18] dark:text-[#EDEDEC]">Smart Templates:</strong> Get started instantly with AI-powered budget templates tailored to your income
                                 </span>
-                            </span>
-                            <span>
-                                Watch video tutorials at
-                                <a href="https://laracasts.com" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Laracasts</span>
-                                    <svg
-                                        width="10"
-                                        height="11"
-                                        viewBox="0 0 10 11"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-2.5 h-2.5"
-                                    >
-                                        <path
-                                            d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                            stroke="currentColor"
-                                            stroke-linecap="square"
-                                        />
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mt-0.5">
+                                    <svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                     </svg>
-                                </a>
-                            </span>
-                        </li>
-                    </ul>
-                    <ul class="flex gap-3 text-sm leading-normal">
-                        <li>
-                            <a href="https://cloud.laravel.com" target="_blank" class="inline-block dark:bg-[#eeeeec] dark:border-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white dark:hover:border-white hover:bg-black hover:border-black px-5 py-1.5 bg-[#1b1b18] rounded-sm border border-black text-white text-sm leading-normal">
-                                Deploy now
+                                </div>
+                                <span class="text-[#706f6c] dark:text-[#A1A09A]">
+                                    <strong class="text-[#1b1b18] dark:text-[#EDEDEC]">Real-time Tracking:</strong> Monitor your spending and stay within budget with live updates
+                                </span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="flex-shrink-0 w-6 h-6 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mt-0.5">
+                                    <svg class="w-3 h-3 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <span class="text-[#706f6c] dark:text-[#A1A09A]">
+                                    <strong class="text-[#1b1b18] dark:text-[#EDEDEC]">Goal Setting:</strong> Set financial goals and track your progress month by month
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="inline-flex items-center justify-center px-6 py-3 bg-[#1b1b18] dark:bg-[#eeeeec] text-white dark:text-[#1C1C1A] hover:bg-black dark:hover:bg-white border border-[#1b1b18] dark:border-[#eeeeec] rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl">
+                                Go to Dashboard
                             </a>
-                        </li>
-                    </ul>
+                        @else
+                            <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-6 py-3 bg-[#1b1b18] dark:bg-[#eeeeec] text-white dark:text-[#1C1C1A] hover:bg-black dark:hover:bg-white border border-[#1b1b18] dark:border-[#eeeeec] rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl">
+                                Get Started Free
+                            </a>
+                            <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-3 bg-transparent text-[#1b1b18] dark:text-[#EDEDEC] hover:bg-gray-50 dark:hover:bg-gray-800 border border-[#e3e3e0] dark:border-[#3E3E3A] rounded-lg font-medium transition-all duration-200">
+                                Sign In
+                            </a>
+                        @endauth
+                    </div>
                 </div>
-                <div class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
+                <div class="bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden flex items-center justify-center">
+                    <!-- Budget Illustration -->
+                    <div class="relative w-full h-full flex items-center justify-center p-8">
+                        <!-- Main circular chart representation -->
+                        <div class="relative w-64 h-64">
+                            <!-- Outer ring - Total budget -->
+                            <div class="absolute inset-0 rounded-full border-8 border-gray-200 dark:border-gray-700"></div>
+                            
+                            <!-- Budget segments -->
+                            <div class="absolute inset-0 rounded-full" style="background: conic-gradient(
+                                #10b981 0deg 108deg,
+                                #3b82f6 108deg 180deg,
+                                #f59e0b 180deg 252deg,
+                                #ef4444 252deg 288deg,
+                                #8b5cf6 288deg 324deg,
+                                #f3f4f6 324deg 360deg
+                            ); clip-path: circle(50% at 50% 50%);"></div>
+                            
+                            <!-- Inner circle -->
+                            <div class="absolute inset-8 rounded-full bg-white dark:bg-[#161615] flex items-center justify-center shadow-lg">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-[#1b1b18] dark:text-[#EDEDEC]">$3,200</div>
+                                    <div class="text-sm text-[#706f6c] dark:text-[#A1A09A]">Monthly Budget</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating budget categories -->
+                        <div class="absolute top-6 left-6 bg-white dark:bg-[#161615] rounded-lg shadow-md p-3 transform -rotate-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Housing 30%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute top-6 right-6 bg-white dark:bg-[#161615] rounded-lg shadow-md p-3 transform rotate-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Food 20%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute bottom-6 left-6 bg-white dark:bg-[#161615] rounded-lg shadow-md p-3 transform rotate-1">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Transport 20%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute bottom-6 right-6 bg-white dark:bg-[#161615] rounded-lg shadow-md p-3 transform -rotate-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                                <span class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Savings 10%</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Dollar sign decoration -->
+                        <div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 text-emerald-200 dark:text-emerald-800 text-6xl font-bold opacity-20">$</div>
+                        <div class="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2 text-blue-200 dark:text-blue-800 text-4xl font-bold opacity-20">$</div>
+                    </div>
+                    
+                    <!-- Border overlay -->
+                    <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
+                </div>
                     {{-- Laravel Logo --}}
                     <svg class="w-full text-[#F53003] dark:text-[#F61500] transition-all translate-y-0 opacity-100 max-w-none duration-750 starting:opacity-0 starting:translate-y-6" viewBox="0 0 438 104" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.2036 -3H0V102.197H49.5189V86.7187H17.2036V-3Z" fill="currentColor" />
