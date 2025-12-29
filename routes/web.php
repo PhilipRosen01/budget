@@ -33,6 +33,10 @@ Route::get('/debug-onboarding', function () {
 })->middleware('auth');
 
 Route::get('/', function () {
+    // Redirect authenticated users to dashboard, otherwise show login
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
     return view('welcome');
 })->name('home');
 
