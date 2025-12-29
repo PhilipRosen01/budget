@@ -201,7 +201,6 @@
             @endif
         </div>
     </div>
-    @endif
 
     <!-- Generate Other Month Modal -->
     <div id="generateMonthModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">

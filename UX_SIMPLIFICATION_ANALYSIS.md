@@ -18,6 +18,7 @@
 ### Core Principle: **Mobile-First, Action-Focused Design**
 
 Users should be able to:
+
 1. **See** their financial status at a glance
 2. **Add** expenses quickly (1-2 taps)
 3. **Track** budget progress simply
@@ -28,50 +29,62 @@ Users should be able to:
 ## 🔥 Redundancies to Remove
 
 ### 1. **Dashboard Header** (Current: 5+ buttons)
+
 **REMOVE:**
-- ❌ "Generate Other Month" button (move to settings/templates)
-- ❌ "Delete Month" button (move to month dropdown menu)
-- ❌ Multiple "Back to Dashboard" buttons across pages
+
+-   ❌ "Generate Other Month" button (move to settings/templates)
+-   ❌ "Delete Month" button (move to month dropdown menu)
+-   ❌ Multiple "Back to Dashboard" buttons across pages
 
 **KEEP:**
-- ✅ Month selector dropdown (primary navigation)
-- ✅ Single "+" FAB button for quick actions
+
+-   ✅ Month selector dropdown (primary navigation)
+-   ✅ Single "+" FAB button for quick actions
 
 ### 2. **Quick Actions Section** (Current: 3 buttons)
+
 **REDUNDANT:** This entire section duplicates navigation menu
-- "Create Template" → Already in Templates nav
-- "Add Purchase" → Should be primary FAB button
-- "View Monthly Budgets" → Already in Monthly Budgets nav
+
+-   "Create Template" → Already in Templates nav
+-   "Add Purchase" → Should be primary FAB button
+-   "View Monthly Budgets" → Already in Monthly Budgets nav
 
 **REPLACE WITH:** Single prominent "Add Expense" button
 
 ### 3. **Budget Setup Flow** (Current: 3 different methods)
+
 **TOO COMPLEX:**
-- Method 1: Auto-generate from templates
-- Method 2: Select specific templates
-- Method 3: Manual budget entry
-- Method 4: "Smart Distribute" feature
+
+-   Method 1: Auto-generate from templates
+-   Method 2: Select specific templates
+-   Method 3: Manual budget entry
+-   Method 4: "Smart Distribute" feature
 
 **SIMPLIFY TO:**
-- **Auto-generate** (default, happens automatically)
-- **Customize** (single button to adjust if needed)
+
+-   **Auto-generate** (default, happens automatically)
+-   **Customize** (single button to adjust if needed)
 
 ### 4. **Navigation Menu** (Current: 5 items)
+
 **CONSOLIDATE:**
-- ❌ "Templates" + "Monthly Budgets" → Merge into "Budgets"
-- ❌ "Goals & Rewards" → Move to Profile/Settings
-- ❌ "Purchases" → Access via dashboard cards only
+
+-   ❌ "Templates" + "Monthly Budgets" → Merge into "Budgets"
+-   ❌ "Goals & Rewards" → Move to Profile/Settings
+-   ❌ "Purchases" → Access via dashboard cards only
 
 **NEW NAV:**
-- Dashboard (Home)
-- Budgets (Templates + Monthly)
-- Profile (Settings + Goals)
+
+-   Dashboard (Home)
+-   Budgets (Templates + Monthly)
+-   Profile (Settings + Goals)
 
 ---
 
 ## 📱 Mobile-First Recommendations
 
 ### 1. **Simplified Dashboard**
+
 ```
 ┌─────────────────────────┐
 │  Budget - January 2024  │ ← Month selector
@@ -94,6 +107,7 @@ Users should be able to:
 ```
 
 ### 2. **Consolidated Stats Cards**
+
 **CURRENT:** 4 separate cards (Available, Spent, Remaining, Used%)
 **NEW:** 1 unified card with key metrics
 
@@ -110,13 +124,13 @@ Users should be able to:
             {{ $percentage_used }}%
         </div>
     </div>
-    
+
     <!-- Simple Progress Bar -->
     <div class="w-full bg-gray-200 rounded-full h-3">
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full" 
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full"
              style="width: {{ $percentage_used }}%"></div>
     </div>
-    
+
     <!-- Compact Stats -->
     <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t">
         <div>
@@ -132,11 +146,12 @@ Users should be able to:
 ```
 
 ### 3. **Floating Action Button (FAB)**
+
 **PRIMARY ACTION:** Add expense instantly
 
 ```blade
 <!-- Fixed FAB Button -->
-<button onclick="openQuickAddModal()" 
+<button onclick="openQuickAddModal()"
         class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all z-50 flex items-center justify-center">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -151,6 +166,7 @@ Users should be able to:
 ### **Dashboard**
 
 #### ❌ REMOVE:
+
 1. Quick Actions section (redundant)
 2. "Spending Breakdown by Category" table (too detailed)
 3. "Recent Budget Activity" section
@@ -158,6 +174,7 @@ Users should be able to:
 5. Multiple CTA buttons in empty states
 
 #### ✅ KEEP & IMPROVE:
+
 1. Single unified stats card
 2. Recent purchases (max 5, simplified)
 3. Top 3 budget categories with progress bars
@@ -165,6 +182,7 @@ Users should be able to:
 5. Single FAB for "Add Expense"
 
 #### 🆕 ADD:
+
 1. Quick expense entry modal
 2. Swipe actions for recent purchases (delete/edit)
 3. Pull-to-refresh for mobile
@@ -174,12 +192,14 @@ Users should be able to:
 ### **Budget Templates Page**
 
 #### ❌ REMOVE:
+
 1. "Generate Next Month" button (auto-generate)
 2. "Generate Current Month" button (auto-generate)
 3. Separate "Monthly Budgets" page (merge)
 4. Complex template selection flow
 
 #### ✅ SIMPLIFY TO:
+
 ```
 My Budget Categories
 ├── 🍔 Food & Dining     $400/month
@@ -190,22 +210,25 @@ My Budget Categories
 ```
 
 Each category:
-- Tap to edit amount
-- Long-press to delete
-- Auto-applies to new months
+
+-   Tap to edit amount
+-   Long-press to delete
+-   Auto-applies to new months
 
 ---
 
 ### **Navigation**
 
 #### CURRENT (5 items):
+
 1. Dashboard
 2. Templates
-3. Monthly Budgets  
+3. Monthly Budgets
 4. Purchases
 5. Goals & Rewards
 
 #### NEW (3 items):
+
 1. **Dashboard** - Overview & recent activity
 2. **Budgets** - Categories & monthly allocation
 3. **Profile** - Settings, goals, preferences
@@ -215,6 +238,7 @@ Each category:
 ## 💡 Simplified User Flows
 
 ### Flow 1: Add an Expense (Most Common Action)
+
 **BEFORE:** Dashboard → Purchases → Create → Form (5 fields) → Save
 **AFTER:** Tap FAB → Amount + Category → Save (2 taps)
 
@@ -233,10 +257,12 @@ Each category:
 ```
 
 ### Flow 2: Check Budget Status
+
 **BEFORE:** Dashboard → Scroll through 4 cards + progress bar + breakdown table
 **AFTER:** Open app → See unified card (1 glance)
 
 ### Flow 3: Adjust Budget
+
 **BEFORE:** Templates → Create/Edit → Form → Save → Monthly Budgets → Setup → Distribute
 **AFTER:** Budgets → Tap category → Adjust amount → Auto-updates
 
@@ -245,26 +271,31 @@ Each category:
 ## 🎨 Design System Simplification
 
 ### Colors
+
 **CURRENT:** 7+ colors (green, red, blue, purple, yellow, indigo, gray)
 **NEW:** 3 colors
-- **Primary:** Indigo-Purple gradient (brand)
-- **Success:** Green (positive balance)
-- **Alert:** Red (overspending)
+
+-   **Primary:** Indigo-Purple gradient (brand)
+-   **Success:** Green (positive balance)
+-   **Alert:** Red (overspending)
 
 ### Typography
-- **Large:** Budget amounts, page titles
-- **Medium:** Category names, labels
-- **Small:** Helper text, timestamps
+
+-   **Large:** Budget amounts, page titles
+-   **Medium:** Category names, labels
+-   **Small:** Helper text, timestamps
 
 ### Spacing
-- **Mobile:** 4px, 8px, 16px, 24px
-- **Desktop:** Add 32px, 48px
+
+-   **Mobile:** 4px, 8px, 16px, 24px
+-   **Desktop:** Add 32px, 48px
 
 ---
 
 ## 📋 Implementation Priority
 
 ### Phase 1: Critical Simplifications (Week 1)
+
 1. ✅ Remove Quick Actions section
 2. ✅ Consolidate 4 stat cards into 1 unified card
 3. ✅ Add FAB button for quick expense entry
@@ -272,6 +303,7 @@ Each category:
 5. ✅ Reduce navigation from 5 to 3 items
 
 ### Phase 2: Mobile Optimization (Week 2)
+
 1. ✅ Implement touch-friendly button sizes (min 44px)
 2. ✅ Add swipe gestures for actions
 3. ✅ Optimize forms for mobile input
@@ -279,6 +311,7 @@ Each category:
 5. ✅ Test on actual mobile devices
 
 ### Phase 3: Flow Consolidation (Week 3)
+
 1. ✅ Merge Templates + Monthly Budgets
 2. ✅ Auto-generate budgets (remove manual steps)
 3. ✅ Simplify purchase entry flow
@@ -290,20 +323,22 @@ Each category:
 ## 🔍 Before & After Metrics
 
 ### Complexity Score
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Dashboard Sections | 8 | 3 | -63% |
-| Navigation Items | 5 | 3 | -40% |
-| Buttons on Dashboard | 12+ | 1 FAB | -92% |
-| Taps to Add Expense | 5 | 2 | -60% |
-| Template Actions | 5 | 2 | -60% |
-| Cards on Dashboard | 4 | 1 | -75% |
+
+| Metric               | Before | After | Improvement |
+| -------------------- | ------ | ----- | ----------- |
+| Dashboard Sections   | 8      | 3     | -63%        |
+| Navigation Items     | 5      | 3     | -40%        |
+| Buttons on Dashboard | 12+    | 1 FAB | -92%        |
+| Taps to Add Expense  | 5      | 2     | -60%        |
+| Template Actions     | 5      | 2     | -60%        |
+| Cards on Dashboard   | 4      | 1     | -75%        |
 
 ### Mobile Usability Score
-- **Touch Target Size:** 28px → 44px ✅
-- **Text Readability:** 12px → 14px ✅
-- **Tap Efficiency:** 5 taps → 2 taps ✅
-- **Scroll Distance:** 3 screens → 1.5 screens ✅
+
+-   **Touch Target Size:** 28px → 44px ✅
+-   **Text Readability:** 12px → 14px ✅
+-   **Tap Efficiency:** 5 taps → 2 taps ✅
+-   **Scroll Distance:** 3 screens → 1.5 screens ✅
 
 ---
 

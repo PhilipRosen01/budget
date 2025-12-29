@@ -12,20 +12,25 @@
 ## 📋 Phase 1: Quick Wins (Week 1 - Days 1-3)
 
 ### Day 1: Dashboard Cleanup
+
 **Time Estimate:** 2-3 hours
 
 #### Task 1.1: Remove Quick Actions Section
+
 **File:** `resources/views/dashboard.blade.php`
 **Lines:** ~155-176
 **Action:** Delete entire section
 **Reason:** Duplicates navigation menu
 
 #### Task 1.2: Consolidate Stat Cards
-**Files:** 
-- `resources/views/dashboard.blade.php` (lines 72-152)
-- Create: `resources/views/components/unified-budget-card.blade.php`
+
+**Files:**
+
+-   `resources/views/dashboard.blade.php` (lines 72-152)
+-   Create: `resources/views/components/unified-budget-card.blade.php`
 
 **New Component Code:**
+
 ```blade
 <!-- components/unified-budget-card.blade.php -->
 <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -42,7 +47,7 @@
 
     <!-- Progress Bar -->
     <div class="w-full bg-gray-200 rounded-full h-4 mb-6">
-        <div class="h-4 rounded-full transition-all duration-500 {{ $percentage_used > 90 ? 'bg-red-500' : ($percentage_used > 75 ? 'bg-yellow-500' : 'bg-gradient-to-r from-indigo-600 to-purple-600') }}" 
+        <div class="h-4 rounded-full transition-all duration-500 {{ $percentage_used > 90 ? 'bg-red-500' : ($percentage_used > 75 ? 'bg-yellow-500' : 'bg-gradient-to-r from-indigo-600 to-purple-600') }}"
              style="width: {{ min($percentage_used, 100) }}%">
         </div>
     </div>
@@ -62,9 +67,10 @@
 ```
 
 **Dashboard Update:**
+
 ```blade
 <!-- Replace lines 72-152 with: -->
-<x-unified-budget-card 
+<x-unified-budget-card
     :remaining="$budgetStats['remaining']"
     :total_budget="$budgetStats['total_budget']"
     :total_spent="$budgetStats['total_spent']"
@@ -75,12 +81,13 @@
 ### Day 2: Add Floating Action Button (FAB)
 
 #### Task 2.1: Create FAB Component
+
 **File:** `resources/views/components/fab-button.blade.php`
 
 ```blade
 <!-- Fixed Floating Action Button -->
 <div class="fixed bottom-6 right-6 z-50">
-    <button onclick="openQuickAddModal()" 
+    <button onclick="openQuickAddModal()"
             class="w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center"
             style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);"
             aria-label="Add expense">
@@ -92,6 +99,7 @@
 ```
 
 #### Task 2.2: Create Quick Add Modal
+
 **File:** `resources/views/components/quick-add-modal.blade.php`
 
 ```blade
@@ -109,16 +117,16 @@
 
         <form action="{{ route('purchases.store') }}" method="POST" class="space-y-4">
             @csrf
-            
+
             <!-- Amount Input -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
                 <div class="relative">
                     <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-gray-400">$</span>
-                    <input type="number" 
-                           name="amount" 
-                           step="0.01" 
-                           required 
+                    <input type="number"
+                           name="amount"
+                           step="0.01"
+                           required
                            autofocus
                            placeholder="0.00"
                            class="w-full pl-10 pr-4 py-4 text-2xl font-semibold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
@@ -128,7 +136,7 @@
             <!-- Category Select -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <select name="budget_id" 
+                <select name="budget_id"
                         required
                         class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                     <option value="">Select category...</option>
@@ -141,7 +149,7 @@
             <!-- Optional: Description -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
-                <input type="text" 
+                <input type="text"
                        name="description"
                        placeholder="e.g., Groceries, Gas, etc."
                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
@@ -149,7 +157,7 @@
 
             <!-- Action Buttons -->
             <div class="flex gap-3 pt-2">
-                <button type="button" 
+                <button type="button"
                         onclick="closeQuickAddModal()"
                         class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
                     Cancel
@@ -189,9 +197,11 @@ document.addEventListener('keydown', function(e) {
 ```
 
 #### Task 2.3: Update Dashboard Layout
+
 **File:** `resources/views/dashboard.blade.php`
 
 Add before closing `</x-app-layout>`:
+
 ```blade
 <!-- Include FAB and Modal -->
 <x-fab-button />
@@ -201,9 +211,11 @@ Add before closing `</x-app-layout>`:
 ### Day 3: Simplify Header
 
 #### Task 3.1: Clean Header Buttons
+
 **File:** `resources/views/dashboard.blade.php` (lines 10-66)
 
 **Replace entire header content with:**
+
 ```blade
 <x-slot name="header">
     @if(session('success'))
@@ -211,7 +223,7 @@ Add before closing `</x-app-layout>`:
             <span class="block sm:inline">{{ session('success') }}</span>
         </div>
     @endif
-    
+
     <div class="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
         <div>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -223,15 +235,15 @@ Add before closing `</x-app-layout>`:
                 <p class="text-sm text-gray-500">{{ $selectedMonth }}</p>
             @endif
         </div>
-        
+
         <!-- Simplified Month Selector -->
         @if($availableMonths->count() > 0)
             <div class="flex items-center space-x-3">
                 <label for="month-selector" class="text-sm font-medium text-gray-700 hidden md:block">Month:</label>
                 <form method="GET" action="{{ route('dashboard') }}" class="inline">
-                    <select id="month-selector" 
-                            name="month-year" 
-                            onchange="this.form.submit()" 
+                    <select id="month-selector"
+                            name="month-year"
+                            onchange="this.form.submit()"
                             class="block w-full md:w-56 px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
                         @foreach($availableMonths as $month)
                             <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
@@ -255,9 +267,11 @@ Add before closing `</x-app-layout>`:
 ### Day 4: Reduce Navigation Items
 
 #### Task 4.1: Update Navigation Menu
+
 **File:** `resources/views/layouts/navigation.blade.php`
 
 **Replace lines 14-27 with:**
+
 ```blade
 <!-- Desktop Navigation -->
 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -267,14 +281,14 @@ Add before closing `</x-app-layout>`:
         </svg>
         {{ __('Dashboard') }}
     </x-nav-link>
-    
+
     <x-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*') || request()->routeIs('budgets.*')">
         <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
         {{ __('Budgets') }}
     </x-nav-link>
-    
+
     <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*') || request()->routeIs('purchase-goals.*')">
         <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -289,9 +303,11 @@ Add before closing `</x-app-layout>`:
 ### Day 5: Consolidate Recent Activity
 
 #### Task 5.1: Simplify Recent Purchases Section
+
 **File:** `resources/views/dashboard.blade.php`
 
 Find the "Recent Purchases" section and replace with:
+
 ```blade
 <!-- Recent Expenses -->
 @if($recentPurchases->count() > 0)
@@ -302,7 +318,7 @@ Find the "Recent Purchases" section and replace with:
             View All →
         </a>
     </div>
-    
+
     <div class="space-y-3">
         @foreach($recentPurchases->take(5) as $purchase)
             <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors group">
@@ -312,7 +328,7 @@ Find the "Recent Purchases" section and replace with:
                          style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
                         {{ $purchase->budget->icon ?? '💰' }}
                     </div>
-                    
+
                     <!-- Purchase Info -->
                     <div class="flex-1 min-w-0">
                         <p class="font-medium text-gray-900 truncate">
@@ -323,18 +339,18 @@ Find the "Recent Purchases" section and replace with:
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Amount -->
                 <div class="text-right ml-4">
                     <p class="font-semibold text-gray-900">${{ number_format($purchase->amount, 2) }}</p>
                 </div>
-                
+
                 <!-- Quick Actions (Show on hover/mobile) -->
                 <div class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <form action="{{ route('purchases.destroy', $purchase) }}" method="POST" class="inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" 
+                        <button type="submit"
                                 onclick="return confirm('Delete this purchase?')"
                                 class="p-2 text-red-500 hover:bg-red-50 rounded-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,12 +375,14 @@ Find the "Recent Purchases" section and replace with:
 **Files to modify:** `resources/views/dashboard.blade.php`
 
 **REMOVE these sections entirely:**
+
 1. ❌ "Spending Breakdown by Category" (lines ~247-285) - Too detailed, info shown in top categories
 2. ❌ "Recent Budget Activity" section - Redundant with recent purchases
 3. ❌ "Monthly Spending Trends" chart - Move to separate analytics page
 4. ❌ Empty state multiple CTAs - Keep only 1 primary button
 
 **KEEP & OPTIMIZE:**
+
 1. ✅ Unified budget card
 2. ✅ Recent expenses (5 max)
 3. ✅ Top 3 categories with simple progress bars
@@ -373,9 +391,11 @@ Find the "Recent Purchases" section and replace with:
 ### Days 8-10: Mobile Optimization
 
 #### Task: Ensure Touch-Friendly Sizes
+
 **File:** `resources/css/app.css`
 
 Add mobile-first utilities:
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -386,12 +406,12 @@ Add mobile-first utilities:
     .btn-touch {
         @apply min-h-[44px] min-w-[44px] px-4 py-3;
     }
-    
+
     /* Mobile-first spacing */
     .container-mobile {
         @apply px-4 sm:px-6 lg:px-8;
     }
-    
+
     /* Card styles */
     .card-modern {
         @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow;
@@ -406,9 +426,11 @@ Add mobile-first utilities:
 ### Days 11-13: Merge Templates + Monthly Budgets
 
 #### Task: Create Unified Budgets Page
+
 **New File:** `resources/views/budgets/unified.blade.php`
 
 **Route Update:** `routes/web.php`
+
 ```php
 // Replace separate routes with unified
 Route::get('/budgets', [BudgetController::class, 'unified'])->name('budgets.index');
@@ -417,26 +439,28 @@ Route::get('/budgets', [BudgetController::class, 'unified'])->name('budgets.inde
 ### Days 14-15: Auto-Generate Logic
 
 #### Task: Simplify Budget Creation
+
 **File:** `app/Http/Controllers/BudgetController.php`
 
 Add auto-generation on month view:
+
 ```php
 public function unified(Request $request)
 {
     $user = auth()->user();
     $currentMonth = Carbon::now();
-    
+
     // Auto-generate if no budgets exist for current month
     $budgetsExist = Budget::where('user_id', $user->id)
         ->whereMonth('month_year', $currentMonth->month)
         ->whereYear('month_year', $currentMonth->year)
         ->exists();
-    
+
     if (!$budgetsExist) {
         // Auto-generate from active templates
         $this->autoGenerateFromTemplates($user, $currentMonth);
     }
-    
+
     // ... rest of logic
 }
 ```
@@ -446,25 +470,28 @@ public function unified(Request $request)
 ## ✅ Testing Checklist
 
 ### Mobile Testing (Required)
-- [ ] Test on actual iPhone (Safari)
-- [ ] Test on actual Android (Chrome)
-- [ ] All buttons are at least 44x44px
-- [ ] Forms are easy to fill on mobile
-- [ ] FAB button doesn't overlap content
-- [ ] Modal is scrollable on small screens
+
+-   [ ] Test on actual iPhone (Safari)
+-   [ ] Test on actual Android (Chrome)
+-   [ ] All buttons are at least 44x44px
+-   [ ] Forms are easy to fill on mobile
+-   [ ] FAB button doesn't overlap content
+-   [ ] Modal is scrollable on small screens
 
 ### Desktop Testing
-- [ ] Layout looks good on 1920px
-- [ ] Layout looks good on 1366px
-- [ ] Hover states work
-- [ ] Keyboard navigation works
+
+-   [ ] Layout looks good on 1920px
+-   [ ] Layout looks good on 1366px
+-   [ ] Hover states work
+-   [ ] Keyboard navigation works
 
 ### Functionality Testing
-- [ ] Can add expense via FAB
-- [ ] Month selector works
-- [ ] Navigation works
-- [ ] Auto-generation works
-- [ ] No broken links
+
+-   [ ] Can add expense via FAB
+-   [ ] Month selector works
+-   [ ] Navigation works
+-   [ ] Auto-generation works
+-   [ ] No broken links
 
 ---
 
@@ -472,20 +499,21 @@ public function unified(Request $request)
 
 Track these BEFORE and AFTER implementation:
 
-| Metric | Before | Target | Actual |
-|--------|--------|--------|--------|
-| Time to add expense | 45s | <15s | ___ |
-| Taps to add expense | 5 | 2-3 | ___ |
-| Dashboard sections | 8 | 3 | ___ |
-| Nav items | 5 | 3 | ___ |
-| Buttons on dashboard | 12+ | 1 FAB | ___ |
-| Mobile usability score | ? | 90+ | ___ |
+| Metric                 | Before | Target | Actual |
+| ---------------------- | ------ | ------ | ------ |
+| Time to add expense    | 45s    | <15s   | \_\_\_ |
+| Taps to add expense    | 5      | 2-3    | \_\_\_ |
+| Dashboard sections     | 8      | 3      | \_\_\_ |
+| Nav items              | 5      | 3      | \_\_\_ |
+| Buttons on dashboard   | 12+    | 1 FAB  | \_\_\_ |
+| Mobile usability score | ?      | 90+    | \_\_\_ |
 
 ---
 
 ## 🚨 Rollback Plan
 
 If issues arise, rollback order:
+
 1. Revert to previous git commit
 2. Keep FAB button (it's helpful)
 3. Keep consolidated stat card (better UX)
@@ -496,17 +524,19 @@ If issues arise, rollback order:
 ## 📝 Notes for Future
 
 ### Features to Consider Later:
-- Dark mode
-- Expense categories with emojis
-- Budget insights/recommendations
-- Export data functionality
-- Recurring expenses
+
+-   Dark mode
+-   Expense categories with emojis
+-   Budget insights/recommendations
+-   Export data functionality
+-   Recurring expenses
 
 ### Do NOT Add:
-- More automation options
-- Template variations
-- Complex charts
-- Social features
-- Gamification (unless very subtle)
+
+-   More automation options
+-   Template variations
+-   Complex charts
+-   Social features
+-   Gamification (unless very subtle)
 
 **Remember:** Simple is sustainable. Complex is technical debt.

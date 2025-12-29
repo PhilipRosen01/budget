@@ -3,17 +3,19 @@
 ## 🎯 What Changed Today
 
 ### Navigation (Top Bar)
+
 ```
 BEFORE: 5 items          AFTER: 3 items
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Dashboard                🏠 Dashboard
 Templates                💰 Budgets (merged)
 Monthly Budgets          👤 Profile
-Purchases              
+Purchases
 Goals & Rewards          Goals moved to Profile dropdown
 ```
 
 ### Dashboard Layout
+
 ```
 BEFORE                          AFTER
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -23,6 +25,7 @@ BEFORE                          AFTER
 ```
 
 ### Add Expense Flow
+
 ```
 BEFORE                          AFTER
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -36,26 +39,29 @@ Navigate to new page            Modal on same page
 ## ⚡ New Features
 
 ### 1. Floating Action Button (FAB)
-- **Location:** Bottom-right corner (always visible)
-- **Action:** Opens quick add expense modal
-- **Shortcut:** `Shift + A`
-- **Color:** Purple gradient
+
+-   **Location:** Bottom-right corner (always visible)
+-   **Action:** Opens quick add expense modal
+-   **Shortcut:** `Shift + A`
+-   **Color:** Purple gradient
 
 ### 2. Quick Add Modal
-- **Opens:** From FAB or Shift+A
-- **Closes:** Escape key or click outside
-- **Features:** 
-  - Auto-focus on amount
-  - Category dropdown
-  - Optional description
-  - Submit with Enter key
+
+-   **Opens:** From FAB or Shift+A
+-   **Closes:** Escape key or click outside
+-   **Features:**
+    -   Auto-focus on amount
+    -   Category dropdown
+    -   Optional description
+    -   Submit with Enter key
 
 ### 3. Unified Budget Card
-- **Shows:**
-  - Remaining amount (large, color-coded)
-  - Progress bar (smart colors)
-  - Budget summary (2 columns)
-  - Quick stats (status + available)
+
+-   **Shows:**
+    -   Remaining amount (large, color-coded)
+    -   Progress bar (smart colors)
+    -   Budget summary (2 columns)
+    -   Quick stats (status + available)
 
 ---
 
@@ -158,10 +164,11 @@ Phase 3: 📅 Planned
 ## 🚀 Next Phase Preview
 
 Phase 2 will include:
-- Remove spending breakdown chart
-- Remove monthly trends
-- Enhance recent expenses (swipe, icons)
-- Better empty states
+
+-   Remove spending breakdown chart
+-   Remove monthly trends
+-   Enhance recent expenses (swipe, icons)
+-   Better empty states
 
 **Estimated time:** 3-4 hours  
 **Impact:** Another 30% reduction in clutter
