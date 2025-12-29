@@ -16,6 +16,7 @@ class Budget extends Model
         'amount',
         'description',
         'category',
+        'icon',
         'month',
         'year',
         'is_active',
@@ -84,5 +85,57 @@ class Budget extends Model
     {
         $now = Carbon::now();
         return $query->forMonth($now->month, $now->year);
+    }
+
+    /**
+     * Get default icon based on category name if no icon is set
+     */
+    public function getIconAttribute($value): string
+    {
+        // Return the stored icon if it exists
+        if ($value) {
+            return $value;
+        }
+
+        // Otherwise, provide smart defaults based on category/name
+        $name = strtolower($this->name ?? '');
+        $category = strtolower($this->category ?? '');
+
+        // Category-based defaults
+        $categoryIcons = [
+            'food' => '🍔',
+            'groceries' => '🛒',
+            'dining' => '🍽️',
+            'transportation' => '🚗',
+            'gas' => '⛽',
+            'utilities' => '💡',
+            'entertainment' => '🎬',
+            'shopping' => '🛍️',
+            'health' => '🏥',
+            'fitness' => '💪',
+            'education' => '📚',
+            'travel' => '✈️',
+            'rent' => '🏠',
+            'insurance' => '🛡️',
+            'savings' => '💰',
+            'investments' => '📈',
+            'phone' => '📱',
+            'internet' => '🌐',
+            'clothing' => '👕',
+            'personal' => '👤',
+            'pets' => '🐾',
+            'gifts' => '🎁',
+            'subscriptions' => '📺',
+        ];
+
+        // Check category first
+        foreach ($categoryIcons as $key => $icon) {
+            if (str_contains($category, $key) || str_contains($name, $key)) {
+                return $icon;
+            }
+        }
+
+        // Default fallback
+        return '💰';
     }
 }

@@ -35,6 +35,7 @@ class BudgetTemplateController extends Controller
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'category' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:10',
             'description' => 'nullable|string',
         ]);
 
@@ -89,6 +90,7 @@ class BudgetTemplateController extends Controller
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'category' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:10',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
         ]);

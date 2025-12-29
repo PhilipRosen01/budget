@@ -14,6 +14,7 @@ class BudgetTemplate extends Model
         'amount',
         'description',
         'category',
+        'icon',
         'is_active',
         'is_automatic',
     ];
@@ -50,6 +51,7 @@ class BudgetTemplate extends Model
             'amount' => $this->amount,
             'description' => $this->description,
             'category' => $this->category,
+            'icon' => $this->icon,
             'month' => $month,
             'year' => $year,
             'is_active' => true,

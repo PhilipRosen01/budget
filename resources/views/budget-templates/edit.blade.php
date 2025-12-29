@@ -90,6 +90,13 @@
                             <x-input-error :messages="$errors->get('category')" class="mt-2" />
                         </div>
 
+                        <!-- Icon Picker -->
+                        <div class="mb-4">
+                            <x-icon-picker :selected="old('icon', $budgetTemplate->icon ?? '💰')" name="icon" />
+                            <p class="mt-1 text-sm text-gray-500">Choose an icon to easily identify this budget</p>
+                            <x-input-error :messages="$errors->get('icon')" class="mt-2" />
+                        </div>
+
                         <!-- Description -->
                         <div class="mb-4">
                             <x-input-label for="description" :value="__('Description')" />

@@ -60,6 +60,15 @@
                             @enderror
                         </div>
 
+                        <!-- Icon Picker -->
+                        <div>
+                            <x-icon-picker :selected="old('icon', '💰')" name="icon" />
+                            <p class="mt-1 text-sm text-gray-500">Choose an icon to easily identify this budget</p>
+                            @error('icon')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <div>
                             <label for="description" class="block text-sm font-medium text-gray-700">Description (Optional)</label>
                             <textarea name="description" id="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Add any notes about this budget template...">{{ old('description') }}</textarea>
