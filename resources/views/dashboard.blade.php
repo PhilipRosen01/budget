@@ -2,187 +2,61 @@
     <x-slot name="header">
         <!-- Success Message -->
         @if(session('success'))
-            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg" role="alert">
                 <span class="block sm:inline">{{ session('success') }}</span>
             </div>
         @endif
         
-        <!-- Responsive Layout: Mobile stacks, Desktop side-by-side -->
-        <div class="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
+        <!-- Simplified Header: Mobile First -->
+        <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Budget Dashboard - {{ $selectedMonth }}
+                <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
+                    Budget Dashboard
                 </h2>
                 @if($isCurrentMonth)
-                    <p class="text-sm text-gray-500 mt-1 md:mt-0">Current Month</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ $selectedMonth }} (Current Month)</p>
+                @else
+                    <p class="text-sm text-gray-500 mt-1">{{ $selectedMonth }}</p>
                 @endif
             </div>
             
-            <!-- Month Selector and Actions -->
-            <div class="flex flex-col space-y-3 md:flex-row md:items-center md:space-y-0 md:space-x-4">
-                @if($availableMonths->count() > 0)
-                    <div class="flex flex-col space-y-2 md:flex-row md:items-center md:space-y-0 md:space-x-2">
-                        <label for="month-selector" class="text-sm font-medium text-gray-700">View Month:</label>
-                        <form method="GET" action="{{ route('dashboard') }}" class="inline">
-                            <select id="month-selector" name="month-year" onchange="this.form.submit()" class="block w-full md:w-48 px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                @foreach($availableMonths as $month)
-                                    <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
-                                        {{ $month['display'] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </form>
-                    </div>
-                @endif
-                
-                <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-                    <!-- Generate Other Month Button -->
-                    @if($activeTemplates->count() > 0)
-                        <button type="button" onclick="openGenerateMonthModal()" class="w-full md:w-auto inline-flex items-center justify-center px-3 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 md:mr-2">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Generate Other Month
-                        </button>
-                    @endif
-
-                    <!-- Delete Month Budget Button -->
-                    @if($monthBudgets->count() > 0)
-                        <form method="POST" action="{{ route('budgets.destroy-month') }}" class="w-full md:w-auto inline" onsubmit="return confirm('Are you sure you want to delete ALL budgets and purchases for {{ $selectedMonth }}? This cannot be undone.')">
-                            @csrf
-                            @method('DELETE')
-                            <input type="hidden" name="month" value="{{ explode('-', $selectedValue)[0] }}">
-                            <input type="hidden" name="year" value="{{ explode('-', $selectedValue)[1] }}">
-                            <button type="submit" class="w-full md:w-auto inline-flex items-center justify-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                                Delete Month
-                            </button>
-                        </form>
-                    @endif
+            <!-- Month Selector Only -->
+            @if($availableMonths->count() > 0)
+                <div class="flex items-center space-x-3">
+                    <label for="month-selector" class="text-sm font-medium text-gray-700 hidden sm:block">Month:</label>
+                    <form method="GET" action="{{ route('dashboard') }}" class="inline">
+                        <select id="month-selector" 
+                                name="month-year" 
+                                onchange="this.form.submit()" 
+                                class="block w-full sm:w-56 px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm shadow-sm">
+                            @foreach($availableMonths as $month)
+                                <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
+                                    {{ $month['display'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
                 </div>
-            </div>
+            @endif
         </div>
     </x-slot>
 
     <div class="py-6 sm:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Budget Overview Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow-lg rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Available Budget</dt>
-                                    <dd class="text-lg font-medium text-gray-900">${{ number_format($budgetStats['available_budget'], 2) }}</dd>
-                                    <dd class="text-xs text-gray-400">Salary: ${{ number_format($budgetStats['total_salary'], 2) }} - Investment: ${{ number_format($budgetStats['investment_amount'], 2) }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-lg rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Spent</dt>
-                                    <dd class="text-lg font-medium text-gray-900">${{ number_format($budgetStats['total_spent'], 2) }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-lg rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Remaining</dt>
-                                    <dd class="text-lg font-medium {{ $budgetStats['remaining'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                                        ${{ number_format($budgetStats['remaining'], 2) }}
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-lg rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Used</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ number_format($budgetStats['percentage_used'], 1) }}%</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="{{ route('budget-templates.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Create Template
-                        </a>
-                        <a href="{{ route('purchases.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                            </svg>
-                            Add Purchase
-                        </a>
-                        <a href="{{ route('budgets.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H6a2 2 0 00-2 2v10a2 2 0 002-2V9a2 2 0 00-2-2h-2M8 7v4"></path>
-                            </svg>
-                            View Monthly Budgets
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
+            <!-- Unified Budget Overview Card -->
             @if($budgetStats['total_budget'] > 0)
+                <x-unified-budget-card 
+                    :remaining="$budgetStats['remaining']"
+                    :totalBudget="$budgetStats['available_budget']"
+                    :totalSpent="$budgetStats['total_spent']"
+                    :percentageUsed="$budgetStats['percentage_used']"
+                    :salary="$budgetStats['total_salary']"
+                    :investment="$budgetStats['investment_amount']"
+                />
+            @endif
+
+            <!-- Progress Bar (kept for compatibility) -->
+            @if($budgetStats['total_budget'] > 0 && false)
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
                 <div class="p-6">
                     <div class="flex justify-between text-sm text-gray-600 mb-2">
@@ -589,4 +463,10 @@
         }
     });
     </script>
+
+    <!-- Floating Action Button and Quick Add Modal -->
+    @if($monthBudgets->count() > 0)
+        <x-fab-button />
+        <x-quick-add-modal :monthBudgets="$monthBudgets" />
+    @endif
 </x-app-layout>
