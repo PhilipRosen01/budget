@@ -34,7 +34,7 @@ Route::get('/debug-onboarding', function () {
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding.check'])->name('dashboard');

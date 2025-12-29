@@ -1,57 +1,58 @@
+<!-- filepath: /Users/devaccount/Desktop/budget/resources/views/auth/register.blade.php -->
 <x-guest-layout>
     <div class="mb-6 text-center">
-        <h1 class="text-2xl font-semibold text-gray-900">Welcome back</h1>
-        <p class="mt-1 text-sm text-gray-600">Log in to your Budget dashboard.</p>
+        <div class="mx-auto w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-4">
+            <span class="text-white font-bold text-xl">B</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Create your account</h1>
+        <p class="mt-1 text-sm text-gray-600">Start managing your budget today</p>
     </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+    <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Name -->
         <div>
+            <x-input-label for="name" :value="__('Name')" />
+            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        </div>
+
+        <!-- Email Address -->
+        <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-        <div>
+        <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
-
             <x-text-input id="password" class="block mt-1 w-full"
                             type="password"
                             name="password"
-                            required autocomplete="current-password" />
-
+                            required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Remember Me -->
-        <div class="flex items-center justify-between">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-
-            @if (Route::has('password.request'))
-                <a class="text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+        <!-- Confirm Password -->
+        <div class="mt-4">
+            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+                            type="password"
+                            name="password_confirmation" required autocomplete="new-password" />
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <x-primary-button class="w-full justify-center">
-            {{ __('Log in') }}
-        </x-primary-button>
+        <div class="mt-6">
+            <x-primary-button class="w-full justify-center">
+                {{ __('Create Account') }}
+            </x-primary-button>
+        </div>
     </form>
 
-    @if (Route::has('register'))
-        <div class="mt-6 text-center text-sm text-gray-600">
-            <span>New here?</span>
-            <a href="{{ route('register') }}" class="font-medium text-indigo-600 hover:text-indigo-700">Create an account</a>
-        </div>
-    @endif
+    <div class="mt-6 text-center text-sm text-gray-600">
+        <span>Already have an account?</span>
+        <a href="{{ route('login') }}" class="font-medium text-indigo-600 hover:text-indigo-700">Sign in</a>
+    </div>
 </x-guest-layout>
