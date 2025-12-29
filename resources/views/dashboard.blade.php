@@ -70,303 +70,135 @@
             </div>
             @endif
 
-            <!-- Empty State: No Budgets -->
+            <!-- Empty State: No Budgets - Simplified -->
             @if($monthBudgets->count() == 0)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                    <div class="p-8 text-center">
-                        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <div class="bg-white rounded-xl shadow-lg p-8 sm:p-12 text-center mb-8">
+                    <!-- Icon -->
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+                         style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
-                        
-                        @if(!$hasAnyBudgets)
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">Welcome to Your Budget Dashboard!</h3>
-                            <p class="text-gray-600 mb-6">You haven't created any budgets yet. Let's start by setting up your monthly budget for {{ $selectedMonth }}.</p>
-                        @else
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No Budget for {{ $selectedMonth }}</h3>
-                            <p class="text-gray-600 mb-6">You don't have any budgets set up for this month. Create budgets to start tracking your spending.</p>
-                        @endif
-
-                        @if($activeTemplates->count() > 0)
-                            <div class="flex justify-center">
-                                <a href="{{ route('budgets.setup', ['month' => explode('-', $selectedValue)[0], 'year' => explode('-', $selectedValue)[1]]) }}" class="inline-flex items-center px-8 py-4 bg-indigo-600 border border-transparent rounded-lg font-semibold text-lg text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg">
-                                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                                    </svg>
-                                    Set Up Your Budget
-                                </a>
-                            </div>
-
-                            <div class="mt-6 text-center">
-                                <p class="text-sm text-gray-500 mb-2">Advanced Options:</p>
-                                <div class="flex justify-center space-x-4">
-                                    <a href="{{ route('budgets.create') }}" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Create Individual Budget</a>
-                                    <span class="text-gray-300">|</span>
-                                    <a href="{{ route('budget-templates.create') }}" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Create Templates First</a>
-                                </div>
-                            </div>
-                        @endif
-
-
-                        @if($activeTemplates->count() == 0)
-                            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-yellow-800">No Active Templates</h3>
-                                        <div class="mt-2 text-sm text-yellow-700">
-                                            <p>Create budget templates first to enable auto-population of budgets. <a href="{{ route('budget-templates.create') }}" class="font-medium underline hover:text-yellow-600">Create templates now</a></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
                     </div>
-                </div>
-            @endif
+                    
+                    @if(!$hasAnyBudgets)
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Welcome to Your Budget Tracker! 🎉</h3>
+                        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                            Start tracking your spending in seconds. Create your budget categories and begin adding purchases right away.
+                        </p>
+                    @else
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">No Budget for {{ $selectedMonth }}</h3>
+                        <p class="text-gray-600 mb-8">Set up your budget to start tracking spending this month.</p>
+                    @endif
 
-            <!-- Spending Breakdown by Category -->
-            @if($monthBudgets->count() > 0)
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-6">Spending Breakdown by Category</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        @php
-                            $categoryTotals = $monthBudgets->groupBy('category')->map(function($budgets, $category) {
-                                return [
-                                    'category' => $category ?: 'General',
-                                    'budgeted' => $budgets->sum('amount'),
-                                    'spent' => $budgets->sum(function($budget) { return $budget->totalSpent(); }),
-                                    'count' => $budgets->count()
-                                ];
-                            })->sortByDesc('budgeted');
-                        @endphp
+                    <!-- Primary CTA -->
+                    @if($activeTemplates->count() > 0)
+                        <a href="{{ route('budgets.setup', ['month' => explode('-', $selectedValue)[0], 'year' => explode('-', $selectedValue)[1]]) }}" 
+                           class="inline-flex items-center px-8 py-4 rounded-xl font-bold text-lg text-white transition-all transform hover:scale-105 shadow-lg mb-4"
+                           style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Quick Setup (30 seconds)
+                        </a>
                         
-                        @foreach($categoryTotals as $categoryData)
-                            @php
-                                $percentage = $categoryData['budgeted'] > 0 ? ($categoryData['spent'] / $categoryData['budgeted']) * 100 : 0;
-                                $isInvestmentOrSavings = in_array(strtolower($categoryData['category']), ['investments', 'savings']);
-                                
-                                if ($isInvestmentOrSavings) {
-                                    // Investments and savings are always green (good thing to fill up)
-                                    $barColor = 'green';
-                                } else {
-                                    // Other categories: blue → yellow → red as they fill up
-                                    if ($percentage >= 100) {
-                                        $barColor = 'red';
-                                    } elseif ($percentage >= 75) {
-                                        $barColor = 'yellow';
-                                    } else {
-                                        $barColor = 'blue';
-                                    }
-                                }
-                            @endphp
-                            <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="flex justify-between items-center mb-2">
-                                    <h4 class="text-sm font-medium text-gray-900">{{ ucfirst(str_replace('_', ' ', $categoryData['category'])) }}</h4>
-                                    <span class="text-xs text-gray-500">{{ $categoryData['count'] }} budget{{ $categoryData['count'] !== 1 ? 's' : '' }}</span>
-                                </div>
-                                <div class="text-2xl font-bold text-gray-900 mb-1">
-                                    ${{ number_format($categoryData['spent'], 2) }}
-                                </div>
-                                <div class="text-sm text-gray-600 mb-2">
-                                    of ${{ number_format($categoryData['budgeted'], 2) }}
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                                    <div class="bg-{{ $barColor }}-500 h-2 rounded-full transition-all duration-300" style="width: {{ min($percentage, 100) }}%"></div>
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ number_format($percentage, 1) }}% used
-                                    @if($categoryData['budgeted'] - $categoryData['spent'] >= 0)
-                                        • ${{ number_format($categoryData['budgeted'] - $categoryData['spent'], 2) }} remaining
-                                    @else
-                                        • ${{ number_format($categoryData['spent'] - $categoryData['budgeted'], 2) }} over budget
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            <!-- Monthly Comparison Chart -->
-            @if($availableMonths->count() > 1)
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-6">Monthly Spending Trend</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        @php
-                            $monthlyStats = $availableMonths->take(4)->map(function($month) use ($user) {
-                                $monthBudgets = $user->budgets()->forMonth($month['month'], $month['year'])->get();
-                                $totalBudget = $monthBudgets->sum('amount');
-                                $totalSpent = $monthBudgets->sum(function($budget) { return $budget->totalSpent(); });
-                                return [
-                                    'display' => $month['display'],
-                                    'budgeted' => $totalBudget,
-                                    'spent' => $totalSpent,
-                                    'percentage' => $totalBudget > 0 ? ($totalSpent / $totalBudget) * 100 : 0
-                                ];
-                            });
-                        @endphp
-                        
-                        @foreach($monthlyStats as $monthStat)
-                            <div class="text-center">
-                                <div class="text-sm font-medium text-gray-900 mb-2">{{ $monthStat['display'] }}</div>
-                                <div class="relative pt-1">
-                                    <div class="flex mb-2 items-center justify-between">
-                                        <div>
-                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-{{ $monthStat['percentage'] > 90 ? 'red' : ($monthStat['percentage'] > 75 ? 'yellow' : 'green') }}-600 bg-{{ $monthStat['percentage'] > 90 ? 'red' : ($monthStat['percentage'] > 75 ? 'yellow' : 'green') }}-200">
-                                                {{ number_format($monthStat['percentage'], 0) }}%
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
-                                        <div style="width:{{ min($monthStat['percentage'], 100) }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-{{ $monthStat['percentage'] > 90 ? 'red' : ($monthStat['percentage'] > 75 ? 'yellow' : 'green') }}-500"></div>
-                                    </div>
-                                </div>
-                                <div class="text-xs text-gray-600">
-                                    ${{ number_format($monthStat['spent'], 0) }} / ${{ number_format($monthStat['budgeted'], 0) }}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            <!-- Current Month Budgets, Recent Purchases, and Purchase Goals -->
-            @if($monthBudgets->count() > 0)
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Current Month Budgets -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">{{ $selectedMonth }} Budgets</h3>
-                            <a href="{{ route('budget-templates.index') }}" class="text-sm text-blue-600 hover:text-blue-900">Manage Templates</a>
+                        <div class="text-sm text-gray-500">
+                            or <a href="{{ route('budget-templates.index') }}" class="text-indigo-600 hover:text-indigo-800 font-medium">customize templates</a>
                         </div>
-                        @if($monthBudgets->count() > 0)
-                            <div class="space-y-4">
-                                @foreach($monthBudgets as $budget)
-                                <div class="border-l-4 border-blue-400 pl-4">
-                                    <div class="flex justify-between">
-                                        <h4 class="text-sm font-medium text-gray-900">{{ $budget->name }}</h4>
-                                        @if($budget->category)
-                                            <span class="text-sm text-gray-500">{{ $budget->category }}</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-sm text-gray-600">
-                                        ${{ number_format($budget->totalSpent(), 2) }} / ${{ number_format($budget->amount, 2) }}
-                                    </p>
-                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                        @php
-                                            $percentage = $budget->percentageUsed();
-                                            $isInvestmentOrSavings = in_array(strtolower($budget->category), ['investments', 'savings']);
-                                            
-                                            if ($percentage >= 100) {
-                                                $color = $isInvestmentOrSavings ? 'green' : 'red';
-                                            } elseif ($percentage >= 75) {
-                                                $color = 'yellow';
-                                            } else {
-                                                $color = 'blue';
-                                            }
-                                        @endphp
-                                        <div class="bg-{{ $color }}-600 h-2 rounded-full" style="width: {{ min($percentage, 100) }}%"></div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center py-4">
-                                <p class="text-gray-500 mb-2">No budgets for {{ $selectedMonth }}</p>
-                                <a href="{{ route('budget-templates.create') }}" class="text-blue-600 hover:text-blue-900 text-sm">Create Budget Template</a>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Recent Purchases -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Purchases</h3>
-                        @if($recentPurchases->count() > 0)
-                            <div class="space-y-4">
-                                @foreach($recentPurchases as $purchase)
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h4 class="text-sm font-medium text-gray-900">{{ $purchase->name }}</h4>
-                                        <p class="text-sm text-gray-500">
-                                            {{ $purchase->purchase_date->format('M j, Y') }}
-                                            @if($purchase->category)
-                                                • {{ $purchase->category }}
-                                            @endif
-                                        </p>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-900">${{ number_format($purchase->amount, 2) }}</span>
-                                </div>
-                                @endforeach
-                            </div>
-                            <div class="mt-4">
-                                <a href="{{ route('purchases.index') }}" class="text-sm text-blue-600 hover:text-blue-900">View all purchases →</a>
-                            </div>
-                        @else
-                            <p class="text-gray-500">No purchases yet. <a href="{{ route('purchases.create') }}" class="text-blue-600 hover:text-blue-900">Add your first purchase</a></p>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Purchase Goals & Rewards -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">Goals & Rewards</h3>
-                            <a href="{{ route('purchase-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-900">View All</a>
+                    @else
+                        <!-- No Templates - Create First -->
+                        <a href="{{ route('budget-templates.create') }}" 
+                           class="inline-flex items-center px-8 py-4 rounded-xl font-bold text-lg text-white transition-all transform hover:scale-105 shadow-lg mb-6"
+                           style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Create Your First Budget Category
+                        </a>
+                        
+                        <!-- Quick Guide -->
+                        <div class="bg-indigo-50 rounded-xl p-6 max-w-lg mx-auto text-left">
+                            <h4 class="font-bold text-gray-900 mb-3 flex items-center">
+                                <span class="text-xl mr-2">💡</span>
+                                Getting Started (3 steps):
+                            </h4>
+                            <ol class="space-y-2 text-sm text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="font-bold text-indigo-600 mr-2">1.</span>
+                                    <span>Create budget categories (e.g., Groceries, Gas, Entertainment)</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="font-bold text-indigo-600 mr-2">2.</span>
+                                    <span>Set monthly amounts for each category</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="font-bold text-indigo-600 mr-2">3.</span>
+                                    <span>Start adding purchases and track your spending!</span>
+                                </li>
+                            </ol>
                         </div>
-                        @if($purchaseGoals->count() > 0)
-                            <div class="space-y-4">
-                                @foreach($purchaseGoals as $goal)
-                                <div class="border-l-4 border-{{ $goal->is_completed ? 'green' : 'purple' }}-400 pl-4">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <h4 class="text-sm font-medium text-gray-900">{{ $goal->name }}</h4>
-                                            <p class="text-xs text-gray-500 mb-2">
-                                                Priority {{ $goal->priority }} • 
-                                                ${{ number_format($goal->current_amount, 0) }} / ${{ number_format($goal->target_amount, 0) }}
-                                            </p>
-                                            <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                                <div class="bg-{{ $goal->is_completed ? 'green' : 'purple' }}-600 h-1.5 rounded-full" 
-                                                     style="width: {{ $goal->progress_percentage }}%"></div>
-                                            </div>
-                                        </div>
-                                        @if($goal->is_completed)
-                                            <span class="text-xs text-green-600 font-medium ml-2">✓ Done</span>
-                                        @else
-                                            <span class="text-xs text-purple-600 font-medium ml-2">{{ number_format($goal->progress_percentage, 0) }}%</span>
-                                        @endif
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                            <div class="mt-4">
-                                <a href="{{ route('purchase-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-900">Manage all goals →</a>
-                            </div>
-                        @else
-                            <div class="text-center py-4">
-                                <div class="text-gray-400 mb-2">
-                                    <svg class="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                </div>
-                                <p class="text-gray-500 text-sm mb-2">No purchase goals yet</p>
-                                <a href="{{ route('purchase-goals.create') }}" class="text-blue-600 hover:text-blue-900 text-sm">Create your first goal</a>
-                            </div>
-                        @endif
-                    </div>
+                    @endif
+                </div>
+            @endif
+
+            <!-- Recent Purchases & Top Categories - Focused on Quick Tracking -->
+            @if($monthBudgets->count() > 0)
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Purchases - Primary Focus -->
+                <div class="lg:col-span-1">
+                    <x-recent-purchases :purchases="$recentPurchases" :selectedMonth="$selectedMonth" />
+                </div>
+
+                <!-- Top Categories - Secondary -->
+                <div class="lg:col-span-1">
+                    <x-top-categories :monthBudgets="$monthBudgets" />
                 </div>
             </div>
+            @endif
+
+            <!-- Goals Section (Compact) -->
+            @if($purchaseGoals->count() > 0)
+            <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">Goals & Rewards</h3>
+                    <a href="{{ route('purchase-goals.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+                        View All →
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($purchaseGoals->take(3) as $goal)
+                        <div class="p-4 bg-gradient-to-br from-{{ $goal->is_completed ? 'green' : 'purple' }}-50 to-white rounded-xl border border-{{ $goal->is_completed ? 'green' : 'purple' }}-100">
+                            <div class="flex items-start justify-between mb-2">
+                                <h4 class="font-semibold text-gray-900">{{ $goal->name }}</h4>
+                                @if($goal->is_completed)
+                                    <span class="text-xl">🎉</span>
+                                @else
+                                    <span class="text-xl">🎯</span>
+                                @endif
+                            </div>
+                            
+                            <div class="text-sm text-gray-600 mb-3">
+                                <span class="font-bold text-lg text-gray-900">${{ number_format($goal->current_amount, 0) }}</span>
+                                <span class="text-xs">of ${{ number_format($goal->target_amount, 0) }}</span>
+                            </div>
+                            
+                            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                                <div class="h-2 rounded-full transition-all duration-500 {{ $goal->is_completed ? 'bg-green-500' : 'bg-gradient-to-r from-indigo-600 to-purple-600' }}"
+                                     style="width: {{ min($goal->progress_percentage, 100) }}%"></div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-500">Priority {{ $goal->priority }}</span>
+                                <span class="font-bold {{ $goal->is_completed ? 'text-green-600' : 'text-purple-600' }}">
+                                    {{ number_format($goal->progress_percentage, 0) }}%
+                                </span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
         </div>
     </div>
     @endif
