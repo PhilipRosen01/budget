@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Budget History
+                    Budget History ⚠️ UPDATED VERSION - DEC 29 2025 ⚠️
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">Overview of your monthly budgets and spending</p>
             </div>
