@@ -105,22 +105,13 @@
 
             <!-- Select Button - Simple and Visible -->
             @if($budgets->count() > 0)
-                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Manage Budgets</h3>
-                            <p class="text-sm text-gray-500">Select multiple budgets to delete them at once</p>
-                        </div>
-                        <button @click="toggleSelectionMode()" 
-                                type="button"
-                                class="inline-flex items-center px-6 py-3 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150"
-                                :class="selectionMode ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-500'">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                            </svg>
-                            <span x-text="selectionMode ? 'Cancel Selection' : 'Select Budgets'">Select Budgets</span>
-                        </button>
-                    </div>
+                <div class="flex justify-end mb-4">
+                    <button @click="toggleSelectionMode()" 
+                            type="button"
+                            class="text-sm font-medium transition-colors duration-150"
+                            :class="selectionMode ? 'text-red-600 hover:text-red-700' : 'text-gray-600 hover:text-gray-900'">
+                        <span x-text="selectionMode ? 'Cancel' : 'Select'">Select</span>
+                    </button>
                 </div>
             @endif
 
@@ -206,7 +197,7 @@
                             </div>
 
                             <!-- Content wrapper with space for checkbox -->
-                            <div class="p-6 transition-all duration-200" :class="selectionMode ? 'pl-20 pt-8' : ''">
+                            <div class="p-6 transition-all duration-200" :class="selectionMode ? 'pl-20 pt-10' : ''">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $budget->name }}</h3>
