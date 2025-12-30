@@ -18,6 +18,80 @@ class BudgetController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+        
+        // Get all months with budgets, grouped by month/year
+        $budgetsByMonth = $user->budgets()
+            ->with(['purchases'])
+            ->selectRaw('month, year, SUM(amount) as total_budget, COUNT(*) as budget_count')
+            ->groupBy('month', 'year')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        // Calculate detailed stats for each month
+        $monthlyStats = [];
+        foreach ($budgetsByMonth as $monthData) {
+            $month = $monthData->month;
+            $year = $monthData->year;
+            
+            // Get all budgets for this month
+            $budgets = $user->budgets()->forMonth($month, $year)->with('purchases')->get();
+            
+            // Calculate totals
+            $totalBudgeted = $budgets->sum('amount');
+            $totalSpent = $budgets->sum(function ($budget) {
+                return $budget->purchases->sum('amount');
+            });
+            
+            // Get user's salary for that time period (use current salary as fallback)
+            $monthlySalary = $user->monthly_salary ?? 0;
+            
+            // Calculate savings (salary - spent)
+            $savings = $monthlySalary - $totalSpent;
+            $overUnder = $totalBudgeted - $totalSpent;
+            
+            $date = Carbon::create($year, $month, 1);
+            
+            $monthlyStats[] = [
+                'month' => $month,
+                'year' => $year,
+                'display' => $date->format('F Y'),
+                'total_budgeted' => $totalBudgeted,
+                'total_spent' => $totalSpent,
+                'monthly_salary' => $monthlySalary,
+                'savings' => $savings,
+                'over_under' => $overUnder,
+                'budget_count' => $budgets->count(),
+                'percentage_spent' => $totalBudgeted > 0 ? ($totalSpent / $totalBudgeted) * 100 : 0,
+            ];
+        }
+        
+        // If no budgets exist at all, add current month
+        if (empty($monthlyStats)) {
+            $now = Carbon::now();
+            $monthlyStats[] = [
+                'month' => $now->month,
+                'year' => $now->year,
+                'display' => $now->format('F Y'),
+                'total_budgeted' => 0,
+                'total_spent' => 0,
+                'monthly_salary' => $user->monthly_salary ?? 0,
+                'savings' => $user->monthly_salary ?? 0,
+                'over_under' => 0,
+                'budget_count' => 0,
+                'percentage_spent' => 0,
+            ];
+        }
+        
+        return view('budgets.index', compact('monthlyStats'));
+    }
+
+    /**
+     * Display budgets for a specific month
+     */
+    public function showMonth(Request $request)
+    {
         $month = $request->get('month', Carbon::now()->month);
         $year = $request->get('year', Carbon::now()->year);
         
@@ -29,7 +103,7 @@ class BudgetController extends Controller
         $currentDate = Carbon::create($year, $month, 1);
         $availableMonths = $this->getAvailableMonths();
         
-        return view('budgets.index', compact('budgets', 'currentDate', 'availableMonths', 'month', 'year'));
+        return view('budgets.month', compact('budgets', 'currentDate', 'availableMonths', 'month', 'year'));
     }
 
     /**

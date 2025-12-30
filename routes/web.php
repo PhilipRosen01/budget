@@ -73,6 +73,8 @@ Route::middleware(['auth', 'onboarding.check'])->group(function () {
         ->name('budget-templates.generate-for-month');
     
     // Custom budget routes (must come BEFORE resource routes to avoid conflicts)
+    Route::get('/budgets/month', [BudgetController::class, 'showMonth'])
+        ->name('budgets.month');
     Route::delete('/budgets/month', [BudgetController::class, 'destroyMonth'])
         ->name('budgets.destroy-month');
     Route::post('/budgets/create-from-templates', [BudgetController::class, 'createFromTemplates'])
