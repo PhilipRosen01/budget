@@ -114,33 +114,6 @@
 
     <div class="py-6 sm:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Debug Panel (remove after testing) -->
-            <div class="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h4 class="font-bold text-yellow-800 mb-2">🔍 Debug Info (Select Button Visibility Test)</h4>
-                        <ul class="text-sm text-yellow-900 space-y-1">
-                            <li><strong>Templates Count:</strong> {{ $templates->count() }}</li>
-                            <li><strong>Alpine Loaded:</strong> <span x-text="'Yes - Alpine is working!'">Loading...</span></li>
-                            <li><strong>Selection Mode:</strong> <span x-text="selectionMode ? 'Active' : 'Inactive'">Checking...</span></li>
-                            <li><strong>Selected Templates:</strong> <span x-text="selectedTemplates.length">0</span></li>
-                            <li><strong>Button Condition:</strong> 
-                                @if($templates->count() > 0)
-                                    <span class="text-green-600 font-bold">TRUE - Button should show</span>
-                                @else
-                                    <span class="text-red-600 font-bold">FALSE - Button hidden (no templates)</span>
-                                @endif
-                            </li>
-                        </ul>
-                    </div>
-                    <button onclick="this.closest('.bg-yellow-50').remove()" class="text-yellow-600 hover:text-yellow-800">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     {{ session('success') }}
@@ -287,19 +260,19 @@
                                  'ring-4 ring-blue-500 ring-opacity-50': selectionMode && selectedTemplates.includes({{ $template->id }}),
                                  'cursor-pointer': selectionMode
                              }"
-                             class="bg-white overflow-hidden shadow-sm sm:rounded-lg transition-all duration-200">
+                             class="bg-white overflow-hidden shadow-sm sm:rounded-lg transition-all duration-200 relative">
                             <div class="p-6">
-                                <!-- Selection Checkbox -->
+                                <!-- Selection Checkbox - Positioned at top-left to avoid title overlap -->
                                 <div x-show="selectionMode" 
-                                     class="absolute top-4 right-4 z-10"
+                                     class="absolute top-4 left-4 z-10"
                                      @click.stop>
                                     <input type="checkbox" 
                                            :checked="selectedTemplates.includes({{ $template->id }})"
                                            @change="toggleTemplate({{ $template->id }})"
-                                           class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                           class="h-6 w-6 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
                                 </div>
 
-                                <div class="flex justify-between items-start mb-4">
+                                <div class="flex justify-between items-start mb-4" :class="selectionMode ? 'ml-10' : ''">
                                     <div>
                                         <div class="flex items-center space-x-2">
                                             <h3 class="text-lg font-semibold text-gray-900">{{ $template->name }}</h3>
