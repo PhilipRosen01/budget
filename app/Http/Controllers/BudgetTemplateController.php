@@ -33,11 +33,30 @@ class BudgetTemplateController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'nullable|numeric|min:0',
             'category' => 'nullable|string|max:255',
-            'icon' => 'nullable|string|max:10',
+            'default_category' => 'nullable|string|max:100',
             'description' => 'nullable|string',
+            'is_auto_amount' => 'boolean',
+            'percentage' => 'nullable|numeric|min:0|max:100',
         ]);
+        
+        // Set defaults
+        $validated['is_auto_amount'] = $request->has('is_auto_amount');
+        
+        // If auto amount, amount is not required but percentage is
+        if ($validated['is_auto_amount']) {
+            if (!$validated['percentage'] && !$validated['default_category']) {
+                return back()->withErrors(['percentage' => 'Percentage is required when auto-calculate is enabled.'])->withInput();
+            }
+            // Set a placeholder amount, will be calculated on budget creation
+            $validated['amount'] = 0;
+        } else {
+            // Manual amount required
+            if (!$validated['amount']) {
+                return back()->withErrors(['amount' => 'Amount is required when auto-calculate is disabled.'])->withInput();
+            }
+        }
 
         $template = Auth::user()->budgetTemplates()->create($validated);
 
@@ -88,15 +107,30 @@ class BudgetTemplateController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'nullable|numeric|min:0',
             'category' => 'nullable|string|max:255',
-            'icon' => 'nullable|string|max:10',
+            'default_category' => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
+            'is_auto_amount' => 'boolean',
+            'percentage' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        // Handle checkbox - if not present in request, it means it's unchecked
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        // Handle checkboxes
+        $validated['is_active'] = $request->has('is_active');
+        $validated['is_auto_amount'] = $request->has('is_auto_amount');
+        
+        // Validation for auto amount
+        if ($validated['is_auto_amount']) {
+            if (!$validated['percentage'] && !$validated['default_category']) {
+                return back()->withErrors(['percentage' => 'Percentage is required when auto-calculate is enabled.'])->withInput();
+            }
+            $validated['amount'] = 0;
+        } else {
+            if (!$validated['amount']) {
+                return back()->withErrors(['amount' => 'Amount is required when auto-calculate is disabled.'])->withInput();
+            }
+        }
 
         try {
             $budgetTemplate->update($validated);
@@ -166,6 +200,47 @@ class BudgetTemplateController extends Controller
         $message = $generatedCount > 0 
             ? "Generated {$generatedCount} budgets for " . $currentMonth->format('F Y')
             : "All budgets for " . $currentMonth->format('F Y') . " already exist";
+
+        return redirect()->route('budget-templates.index')->with('success', $message);
+    }
+    
+    /**
+     * Show form to generate budgets for specific month
+     */
+    public function showGenerateForm()
+    {
+        $templates = Auth::user()->activeBudgetTemplates;
+        return view('budget-templates.generate', compact('templates'));
+    }
+    
+    /**
+     * Generate budgets for specified month/year
+     */
+    public function generateForMonth(Request $request)
+    {
+        $validated = $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2020|max:2100',
+        ]);
+        
+        $user = Auth::user();
+        $generatedCount = 0;
+        $month = $validated['month'];
+        $year = $validated['year'];
+
+        foreach ($user->activeBudgetTemplates as $template) {
+            $existingBudget = $template->budgetForMonth($month, $year);
+            
+            if (!$existingBudget) {
+                $template->createMonthlyBudget($month, $year);
+                $generatedCount++;
+            }
+        }
+
+        $monthName = Carbon::create($year, $month, 1)->format('F Y');
+        $message = $generatedCount > 0 
+            ? "Generated {$generatedCount} budgets for {$monthName}"
+            : "All budgets for {$monthName} already exist";
 
         return redirect()->route('budgets.index')->with('success', $message);
     }

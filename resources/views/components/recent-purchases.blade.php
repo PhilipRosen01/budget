@@ -13,18 +13,8 @@
         <div class="space-y-2">
             @foreach($purchases->take(8) as $purchase)
                 <div class="flex items-center justify-between p-3 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 rounded-xl transition-all duration-200 group border border-transparent hover:border-indigo-100">
-                    <!-- Left: Category Icon + Details -->
+                    <!-- Left: Category + Details -->
                     <div class="flex items-center space-x-3 flex-1 min-w-0">
-                        <!-- Category Icon/Emoji -->
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-                             style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
-                            @if($purchase->budget)
-                                <span class="text-white">{{ $purchase->budget->icon ?? '💰' }}</span>
-                            @else
-                                <span class="text-white">💰</span>
-                            @endif
-                        </div>
-                        
                         <!-- Purchase Details -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center space-x-2">

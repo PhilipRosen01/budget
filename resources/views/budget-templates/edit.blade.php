@@ -32,7 +32,20 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('budget-templates.update', $budgetTemplate) }}">
+                    <form method="POST" action="{{ route('budget-templates.update', $budgetTemplate) }}" x-data="{ 
+                        isAutoAmount: {{ old('is_auto_amount', $budgetTemplate->is_auto_amount) ? 'true' : 'false' }},
+                        selectedCategory: '{{ old('default_category', $budgetTemplate->default_category) }}',
+                        defaultCategories: @js(config('budget_categories.categories')),
+                        getDefaultPercentage() {
+                            if (!this.selectedCategory) return 0;
+                            for (let group in this.defaultCategories) {
+                                if (this.defaultCategories[group][this.selectedCategory]) {
+                                    return this.defaultCategories[group][this.selectedCategory].default_percentage;
+                                }
+                            }
+                            return 0;
+                        }
+                    }">
                         @csrf
                         @method('PUT')
 
@@ -51,8 +64,53 @@
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
-                        <!-- Amount -->
+                        <!-- Default Category Selection -->
                         <div class="mb-4">
+                            <x-input-label for="default_category" :value="__('Budget Category')" />
+                            <select name="default_category" id="default_category" 
+                                    x-model="selectedCategory"
+                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">Custom Category (Set your own amount)</option>
+                                @foreach(config('budget_categories.categories') as $groupKey => $categories)
+                                    <optgroup label="{{ config('budget_categories.groups.' . $groupKey . '.label', ucfirst($groupKey)) }}">
+                                        @foreach($categories as $key => $category)
+                                            <option value="{{ $key }}" {{ old('default_category', $budgetTemplate->default_category) === $key ? 'selected' : '' }}>
+                                                {{ $category['name'] }} 
+                                                @if($category['default_percentage'] > 0)
+                                                    ({{ $category['default_percentage'] }}% default)
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-sm text-gray-500" x-show="selectedCategory">
+                                <span x-text="selectedCategory ? defaultCategories[Object.keys(defaultCategories).find(g => defaultCategories[g][selectedCategory])][selectedCategory].description : ''"></span>
+                            </p>
+                            <x-input-error :messages="$errors->get('default_category')" class="mt-2" />
+                        </div>
+
+                        <!-- Auto Amount Toggle -->
+                        <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="is_auto_amount" id="is_auto_amount" 
+                                           x-model="isAutoAmount"
+                                           value="1"
+                                           {{ old('is_auto_amount', $budgetTemplate->is_auto_amount) ? 'checked' : '' }}
+                                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3">
+                                    <label for="is_auto_amount" class="font-medium text-gray-900">Auto-Calculate Amount</label>
+                                    <p class="text-sm text-gray-600">
+                                        Automatically calculate budget amount based on your monthly salary and budget percentage
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amount (Manual Mode) -->
+                        <div class="mb-4" x-show="!isAutoAmount">
                             <x-input-label for="amount" :value="__('Monthly Amount')" />
                             <div class="relative mt-1">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -66,35 +124,55 @@
                                     step="0.01"
                                     min="0"
                                     :value="old('amount', $budgetTemplate->amount)" 
-                                    required 
+                                    x-bind:required="!isAutoAmount"
                                 />
                             </div>
+                            <p class="mt-1 text-sm text-gray-500">The fixed amount you want to budget for this category each month</p>
                             <x-input-error :messages="$errors->get('amount')" class="mt-2" />
+                        </div>
+
+                        <!-- Percentage (Auto Mode) -->
+                        <div class="mb-4" x-show="isAutoAmount">
+                            <x-input-label for="percentage" :value="__('Budget Percentage')" />
+                            <div class="relative mt-1">
+                                <input type="number" 
+                                       name="percentage" 
+                                       id="percentage" 
+                                       step="0.01" 
+                                       min="0" 
+                                       max="100" 
+                                       value="{{ old('percentage', $budgetTemplate->percentage) }}" 
+                                       x-model="selectedCategory ? getDefaultPercentage() : {{ old('percentage', $budgetTemplate->percentage) ?? 0 }}"
+                                       class="block w-full pr-12 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" 
+                                       placeholder="0.00">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">%</span>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Percentage of your monthly salary to allocate
+                                @if(Auth::user()->monthly_salary)
+                                    <span class="font-semibold" x-show="selectedCategory">
+                                        (≈ $<span x-text="Math.round(({{ Auth::user()->monthly_salary }} * getDefaultPercentage()) / 100)"></span>/month)
+                                    </span>
+                                @endif
+                            </p>
+                            <x-input-error :messages="$errors->get('percentage')" class="mt-2" />
                         </div>
 
                         <!-- Category -->
                         <div class="mb-4">
-                            <x-input-label for="category" :value="__('Category')" />
-                            <select id="category" name="category" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">Select a category (optional)</option>
-                                <option value="housing" {{ old('category', $budgetTemplate->category) === 'housing' ? 'selected' : '' }}>Housing</option>
-                                <option value="transportation" {{ old('category', $budgetTemplate->category) === 'transportation' ? 'selected' : '' }}>Transportation</option>
-                                <option value="food" {{ old('category', $budgetTemplate->category) === 'food' ? 'selected' : '' }}>Food</option>
-                                <option value="savings" {{ old('category', $budgetTemplate->category) === 'savings' ? 'selected' : '' }}>Savings</option>
-                                <option value="insurance" {{ old('category', $budgetTemplate->category) === 'insurance' ? 'selected' : '' }}>Insurance</option>
-                                <option value="debt" {{ old('category', $budgetTemplate->category) === 'debt' ? 'selected' : '' }}>Debt Payments</option>
-                                <option value="personal" {{ old('category', $budgetTemplate->category) === 'personal' ? 'selected' : '' }}>Personal/Entertainment</option>
-                                <option value="utilities" {{ old('category', $budgetTemplate->category) === 'utilities' ? 'selected' : '' }}>Utilities</option>
-                                <option value="miscellaneous" {{ old('category', $budgetTemplate->category) === 'miscellaneous' ? 'selected' : '' }}>Miscellaneous</option>
-                            </select>
+                            <x-input-label for="category" :value="__('Custom Category Tag (Optional)')" />
+                            <x-text-input 
+                                id="category" 
+                                class="block mt-1 w-full" 
+                                type="text" 
+                                name="category" 
+                                :value="old('category', $budgetTemplate->category)" 
+                                placeholder="e.g. Food, Housing, Transportation"
+                            />
+                            <p class="mt-1 text-sm text-gray-500">Add a custom tag to organize this budget</p>
                             <x-input-error :messages="$errors->get('category')" class="mt-2" />
-                        </div>
-
-                        <!-- Icon Picker -->
-                        <div class="mb-4">
-                            <x-icon-picker :selected="old('icon', $budgetTemplate->icon ?? '💰')" name="icon" />
-                            <p class="mt-1 text-sm text-gray-500">Choose an icon to easily identify this budget</p>
-                            <x-input-error :messages="$errors->get('icon')" class="mt-2" />
                         </div>
 
                         <!-- Description -->

@@ -53,11 +53,6 @@
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-3">
                             <span class="text-2xl">{{ $medals[$index] }}</span>
-                            <!-- Category Icon -->
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-                                 style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
-                                <span class="text-white">{{ $budget->icon }}</span>
-                            </div>
                             <div>
                                 <h4 class="font-bold text-gray-900">{{ $budget->name }}</h4>
                                 @if($budget->category)

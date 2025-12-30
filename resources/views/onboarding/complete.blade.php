@@ -41,22 +41,21 @@
                                 </div>
                                 <hr class="my-3">
                                 <div class="text-sm text-gray-600">
-                                    <strong>Excluded Expenses:</strong>
+                                    <strong>Budget Templates Created:</strong>
                                     @php
-                                        $excludedExpenses = [];
-                                        if ($user->budgetPreferences->no_rent) $excludedExpenses[] = 'Rent/Mortgage';
-                                        if ($user->budgetPreferences->no_car_payment) $excludedExpenses[] = 'Car Payment';
-                                        if ($user->budgetPreferences->no_insurance) $excludedExpenses[] = 'Insurance';
-                                        if ($user->budgetPreferences->no_phone_bill) $excludedExpenses[] = 'Phone Bill';
-                                        if ($user->budgetPreferences->no_internet) $excludedExpenses[] = 'Internet';
-                                        if ($user->budgetPreferences->no_utilities) $excludedExpenses[] = 'Utilities';
-                                        if ($user->budgetPreferences->no_debt) $excludedExpenses[] = 'Debt Payments';
+                                        $templateCount = $user->budgetTemplates()->where('is_automatic', true)->count();
+                                        $autoTemplateCount = $user->budgetTemplates()->where('is_auto_amount', true)->count();
                                     @endphp
-                                    @if(count($excludedExpenses) > 0)
-                                        {{ implode(', ', $excludedExpenses) }}
-                                    @else
-                                        <em>None - All expense categories included</em>
-                                    @endif
+                                    <div class="mt-2">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                            {{ $templateCount }} templates created
+                                        </span>
+                                        @if($autoTemplateCount > 0)
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 ml-2">
+                                                {{ $autoTemplateCount }} with auto-calculation
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                             @endif
                         </div>

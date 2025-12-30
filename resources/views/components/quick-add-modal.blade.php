@@ -41,7 +41,7 @@
                     <option value="">Select category...</option>
                     @foreach($monthBudgets as $budget)
                         <option value="{{ $budget->id }}">
-                            {{ $budget->icon }} {{ $budget->name }} 
+                            {{ $budget->name }} 
                             (${{ number_format($budget->totalSpent(), 2) }} / ${{ number_format($budget->amount, 2) }})
                         </option>
                     @endforeach

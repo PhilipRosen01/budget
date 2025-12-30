@@ -117,7 +117,7 @@ class OnboardingController extends Controller
     }
 
     /**
-     * Show step 3: Expenses You Don't Pay For
+     * Show step 3: Budget Categories Selection
      */
     public function step3()
     {
@@ -137,30 +137,23 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.step2')->with('error', 'Please complete the investment setup first.');
         }
 
+        $availableBudget = $user->monthly_salary - $preferences->monthly_investment_amount;
+
         return view('onboarding.step3', [
             'salary' => $user->monthly_salary,
             'investment' => $preferences->monthly_investment_amount,
+            'availableBudget' => $availableBudget,
             'preferences' => $preferences
         ]);
     }
 
     /**
-     * Process step 3: Save expense preferences and complete onboarding
+     * Process step 3: Save selected categories and complete onboarding
      */
     public function processStep3(Request $request)
     {
         $validated = $request->validate([
-            'no_rent' => 'boolean',
-            'no_car_payment' => 'boolean', 
-            'no_insurance' => 'boolean',
-            'no_phone_payment' => 'boolean',
-            'no_groceries' => 'boolean',
-            'no_gas' => 'boolean',
-            'no_maintenance' => 'boolean',
-            'no_subscriptions' => 'boolean',
-            'no_internet' => 'boolean',
-            'no_utilities' => 'boolean',
-            'no_debt' => 'boolean',
+            'selected_categories' => 'required|json',
         ]);
 
         $user = Auth::user();
@@ -170,27 +163,21 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.step2')->with('error', 'Please complete the investment setup first.');
         }
 
-        // Update budget preferences with expense settings
-        $preferences->update([
-            'no_rent' => $validated['no_rent'] ?? false,
-            'no_car_payment' => $validated['no_car_payment'] ?? false,
-            'no_insurance' => $validated['no_insurance'] ?? false,
-            'no_phone_payment' => $validated['no_phone_payment'] ?? false,
-            'no_groceries' => $validated['no_groceries'] ?? false,
-            'no_gas' => $validated['no_gas'] ?? false,
-            'no_maintenance' => $validated['no_maintenance'] ?? false,
-            'no_subscriptions' => $validated['no_subscriptions'] ?? false,
-            'no_internet' => $validated['no_internet'] ?? false,
-            'no_utilities' => $validated['no_utilities'] ?? false,
-            'no_debt' => $validated['no_debt'] ?? false,
-        ]);
+        // Decode selected categories
+        $selectedCategories = json_decode($validated['selected_categories'], true);
+        
+        if (empty($selectedCategories)) {
+            return back()->withErrors([
+                'selected_categories' => 'Please select at least one budget category.'
+            ])->withInput();
+        }
 
-        // Generate automatic budget templates based on preferences
+        // Generate automatic budget templates based on selected categories
         try {
-            $this->generateAutomaticTemplates($user);
-            Log::info('Successfully generated automatic templates for user ' . $user->id);
+            $this->generateCategoryTemplates($user, $selectedCategories);
+            Log::info('Successfully generated ' . count($selectedCategories) . ' category templates for user ' . $user->id);
         } catch (\Exception $e) {
-            Log::error('Failed to generate automatic templates for user ' . $user->id . ': ' . $e->getMessage());
+            Log::error('Failed to generate category templates for user ' . $user->id . ': ' . $e->getMessage());
             // Don't fail onboarding if template generation fails
         }
 
@@ -301,7 +288,95 @@ class OnboardingController extends Controller
     }
 
     /**
-     * Generate automatic budget templates for the user during onboarding
+     * Generate category-based budget templates for the user during onboarding
+     */
+    private function generateCategoryTemplates($user, $selectedCategories)
+    {
+        if (!$user->hasMonthlySalary()) {
+            throw new \Exception('User does not have monthly salary set');
+        }
+
+        $budgetCategories = config('budget_categories');
+        $preferences = $user->budgetPreferences;
+        $availableBudget = $user->monthly_salary - ($preferences->monthly_investment_amount ?? 0);
+
+        DB::beginTransaction();
+
+        try {
+            // Delete existing automatic templates (ones that were auto-generated during onboarding)
+            $user->budgetTemplates()
+                ->where('is_automatic', true)
+                ->delete();
+
+            $createdTemplates = [];
+
+            // Create templates for each selected category
+            foreach ($selectedCategories as $categoryName) {
+                // Find the category config
+                $categoryConfig = collect($budgetCategories)->firstWhere('name', $categoryName);
+                
+                if (!$categoryConfig) {
+                    Log::warning("Category config not found for: {$categoryName}");
+                    continue;
+                }
+
+                // Calculate the amount based on percentage
+                $percentage = $categoryConfig['default_percentage'];
+                $amount = ($availableBudget * $percentage) / 100;
+
+                // Create the template with auto-amount enabled
+                $template = $user->budgetTemplates()->create([
+                    'name' => $categoryConfig['name'],
+                    'category' => strtolower(str_replace(' ', '_', $categoryConfig['name'])), // Convert to snake_case
+                    'amount' => round($amount, 2),
+                    'description' => $categoryConfig['description'],
+                    'is_active' => true,
+                    'is_automatic' => true, // Flag to identify auto-generated templates
+                    'is_auto_amount' => true, // Enable auto-calculation
+                    'percentage' => $percentage,
+                    'default_category' => $categoryConfig['name'],
+                ]);
+                
+                // Create budget for current month
+                $currentMonth = Carbon::now();
+                $template->createMonthlyBudget($currentMonth->month, $currentMonth->year);
+                
+                $createdTemplates[] = $template;
+            }
+
+            // Create investment template separately if enabled
+            $investmentAllocation = $preferences->getInvestmentAllocation();
+            if ($investmentAllocation) {
+                $investmentTemplate = $user->budgetTemplates()->create([
+                    'name' => $investmentAllocation['name'],
+                    'category' => $investmentAllocation['category'],
+                    'amount' => $investmentAllocation['amount'],
+                    'description' => $investmentAllocation['description'],
+                    'is_active' => true,
+                    'is_automatic' => true,
+                    'is_auto_amount' => false, // Fixed amount for investments
+                ]);
+                
+                // Create budget for current month
+                $currentMonth = Carbon::now();
+                $investmentTemplate->createMonthlyBudget($currentMonth->month, $currentMonth->year);
+                
+                $createdTemplates[] = $investmentTemplate;
+            }
+
+            DB::commit();
+
+            Log::info('Generated ' . count($createdTemplates) . ' category templates for user ' . $user->id);
+            return $createdTemplates;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Generate automatic budget templates for the user during onboarding (OLD METHOD - kept for backward compatibility)
      */
     private function generateAutomaticTemplates($user)
     {

@@ -65,6 +65,10 @@ Route::middleware(['auth', 'onboarding.check'])->group(function () {
         ->name('budget-templates.generate-next-month');
     Route::post('/budget-templates/generate-current-month', [BudgetTemplateController::class, 'generateCurrentMonth'])
         ->name('budget-templates.generate-current-month');
+    Route::get('/budget-templates-generate', [BudgetTemplateController::class, 'showGenerateForm'])
+        ->name('budget-templates.generate-form');
+    Route::post('/budget-templates-generate', [BudgetTemplateController::class, 'generateForMonth'])
+        ->name('budget-templates.generate-for-month');
     
     // Custom budget routes (must come BEFORE resource routes to avoid conflicts)
     Route::delete('/budgets/month', [BudgetController::class, 'destroyMonth'])

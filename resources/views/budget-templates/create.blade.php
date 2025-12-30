@@ -25,7 +25,20 @@
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('budget-templates.store') }}" class="space-y-6">
+                    <form method="POST" action="{{ route('budget-templates.store') }}" class="space-y-6" x-data="{ 
+                        isAutoAmount: false,
+                        selectedCategory: '',
+                        defaultCategories: @js(config('budget_categories.categories')),
+                        getDefaultPercentage() {
+                            if (!this.selectedCategory) return 0;
+                            for (let group in this.defaultCategories) {
+                                if (this.defaultCategories[group][this.selectedCategory]) {
+                                    return this.defaultCategories[group][this.selectedCategory].default_percentage;
+                                }
+                            }
+                            return 0;
+                        }
+                    }">
                         @csrf
 
                         <div>
@@ -37,34 +50,101 @@
                             @enderror
                         </div>
 
+                        <!-- Default Category Selection -->
                         <div>
+                            <label for="default_category" class="block text-sm font-medium text-gray-700">Budget Category</label>
+                            <select name="default_category" id="default_category" 
+                                    x-model="selectedCategory"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="">Custom Category (Set your own amount)</option>
+                                @foreach(config('budget_categories.categories') as $groupKey => $categories)
+                                    <optgroup label="{{ config('budget_categories.groups.' . $groupKey . '.label', ucfirst($groupKey)) }}">
+                                        @foreach($categories as $key => $category)
+                                            <option value="{{ $key }}">
+                                                {{ $category['name'] }} 
+                                                @if($category['default_percentage'] > 0)
+                                                    ({{ $category['default_percentage'] }}% default)
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-sm text-gray-500" x-show="selectedCategory">
+                                <span x-text="selectedCategory ? defaultCategories[Object.keys(defaultCategories).find(g => defaultCategories[g][selectedCategory])][selectedCategory].description : ''"></span>
+                            </p>
+                            @error('default_category')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Auto Amount Toggle -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="is_auto_amount" id="is_auto_amount" 
+                                           x-model="isAutoAmount"
+                                           value="1"
+                                           {{ old('is_auto_amount') ? 'checked' : '' }}
+                                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3">
+                                    <label for="is_auto_amount" class="font-medium text-gray-900">Auto-Calculate Amount</label>
+                                    <p class="text-sm text-gray-600">
+                                        Automatically calculate budget amount based on your monthly salary and budget percentage
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amount or Percentage -->
+                        <div x-show="!isAutoAmount">
                             <label for="amount" class="block text-sm font-medium text-gray-700">Monthly Budget Amount</label>
                             <div class="mt-1 relative rounded-md shadow-sm">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-gray-500 sm:text-sm">$</span>
                                 </div>
-                                <input type="number" name="amount" id="amount" step="0.01" min="0" value="{{ old('amount') }}" class="block w-full pl-7 pr-12 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="0.00" required>
+                                <input type="number" name="amount" id="amount" step="0.01" min="0" value="{{ old('amount') }}" 
+                                       class="block w-full pl-7 pr-12 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                                       placeholder="0.00"
+                                       :required="!isAutoAmount">
                             </div>
-                            <p class="mt-1 text-sm text-gray-500">The amount you want to budget for this category each month</p>
+                            <p class="mt-1 text-sm text-gray-500">The fixed amount you want to budget for this category each month</p>
                             @error('amount')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="category" class="block text-sm font-medium text-gray-700">Category (Optional)</label>
-                            <input type="text" name="category" id="category" value="{{ old('category') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. Food, Housing, Transportation">
-                            <p class="mt-1 text-sm text-gray-500">Help organize your budgets by category</p>
-                            @error('category')
+                        <div x-show="isAutoAmount">
+                            <label for="percentage" class="block text-sm font-medium text-gray-700">Budget Percentage</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <input type="number" name="percentage" id="percentage" step="0.01" min="0" max="100" 
+                                       value="{{ old('percentage') }}" 
+                                       x-model="selectedCategory ? getDefaultPercentage() : ''"
+                                       class="block w-full pr-12 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                                       placeholder="0.00">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">%</span>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Percentage of your monthly salary to allocate 
+                                @if(Auth::user()->monthly_salary)
+                                    <span class="font-semibold" x-show="selectedCategory">
+                                        (≈ $<span x-text="Math.round(({{ Auth::user()->monthly_salary }} * getDefaultPercentage()) / 100)"></span>/month)
+                                    </span>
+                                @endif
+                            </p>
+                            @error('percentage')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Icon Picker -->
                         <div>
-                            <x-icon-picker :selected="old('icon', '💰')" name="icon" />
-                            <p class="mt-1 text-sm text-gray-500">Choose an icon to easily identify this budget</p>
-                            @error('icon')
+                            <label for="category" class="block text-sm font-medium text-gray-700">Custom Category Tag (Optional)</label>
+                            <input type="text" name="category" id="category" value="{{ old('category') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. Food, Housing, Transportation">
+            <p class="mt-1 text-sm text-gray-500">Add a custom tag to organize this budget</p>
+                            @error('category')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

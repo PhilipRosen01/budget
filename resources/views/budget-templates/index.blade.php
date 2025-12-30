@@ -40,27 +40,13 @@
                                 💡 Think of templates as cookie cutters and monthly budgets as the actual cookies!
                             </p>
                         </div>
-                        <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 lg:flex-shrink-0">
-                            <form action="{{ route('budget-templates.generate-current-month') }}" method="POST" class="inline w-full sm:w-auto">
-                                @csrf
-                                <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span class="hidden xs:inline">Generate Current Month</span>
-                                    <span class="xs:hidden">Current</span>
-                                </button>
-                            </form>
-                            <form action="{{ route('budget-templates.generate-next-month') }}" method="POST" class="inline w-full sm:w-auto">
-                                @csrf
-                                <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span class="hidden xs:inline">Generate Next Month</span>
-                                    <span class="xs:hidden">Next</span>
-                                </button>
-                            </form>
+                        <div class="flex-shrink-0">
+                            <a href="{{ route('budget-templates.generate-form') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Generate Budgets
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -150,9 +136,44 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <div class="text-2xl font-bold text-gray-900">${{ number_format($template->amount, 2) }}</div>
-                                    <div class="text-sm text-gray-500">per month</div>
+                                    @if($template->is_auto_amount)
+                                        <div class="text-2xl font-bold text-indigo-900">
+                                            ${{ number_format($template->getCalculatedAmount(), 2) }}
+                                        </div>
+                                        <div class="text-sm text-indigo-600">
+                                            {{ $template->percentage ?? 0 }}% of salary (auto-calculated)
+                                        </div>
+                                    @else
+                                        <div class="text-2xl font-bold text-gray-900">${{ number_format($template->amount, 2) }}</div>
+                                        <div class="text-sm text-gray-500">per month (fixed)</div>
+                                    @endif
                                 </div>
+
+                                @if($template->default_category)
+                                    @php
+                                        $categoryConfig = collect(config('budget_categories.categories'))
+                                            ->flatten(1)
+                                            ->firstWhere('name', function($cat) use ($template) {
+                                                return array_search($cat, config('budget_categories.categories.needs')) === $template->default_category ||
+                                                       array_search($cat, config('budget_categories.categories.wants')) === $template->default_category ||
+                                                       array_search($cat, config('budget_categories.categories.savings')) === $template->default_category ||
+                                                       array_search($cat, config('budget_categories.categories.other')) === $template->default_category;
+                                            });
+                                        
+                                        // Find the category config properly
+                                        foreach(config('budget_categories.categories') as $groupCategories) {
+                                            if (isset($groupCategories[$template->default_category])) {
+                                                $categoryConfig = $groupCategories[$template->default_category];
+                                                break;
+                                            }
+                                        }
+                                    @endphp
+                                    @if($categoryConfig)
+                                        <p class="text-xs text-blue-600 mb-2">
+                                            📂 {{ $categoryConfig['name'] ?? 'Category' }}
+                                        </p>
+                                    @endif
+                                @endif
 
                                 @if($template->description)
                                     <p class="text-sm text-gray-600 mb-4">{{ $template->description }}</p>
