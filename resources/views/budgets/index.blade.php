@@ -118,8 +118,8 @@
                         </div>
                     </div>
                     <button @click="toggleSelectionMode()" 
-                            class="ml-4 text-sm font-medium transition-colors"
-                            :class="selectionMode ? 'text-red-600 hover:text-red-700' : 'text-gray-600 hover:text-gray-700'">
+                            class="ml-4 px-3 py-1.5 text-sm font-medium rounded transition-colors whitespace-nowrap"
+                            :class="selectionMode ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'">
                         <span x-text="selectionMode ? 'Cancel' : 'Select'"></span>
                     </button>
                 </div>
@@ -131,11 +131,11 @@
                         @php
                             $monthKey = $stats['month'] . '-' . $stats['year'];
                         @endphp
-                        <div class="relative">
+                        <div class="relative" x-data="{}">
                             <!-- Selection Checkbox -->
                             <div x-show="selectionMode" 
                                  x-cloak
-                                 class="absolute top-6 left-8 z-10 p-2 bg-white rounded-lg shadow-sm">
+                                 class="absolute top-6 left-6 z-10 p-2 bg-white rounded-lg shadow-sm">
                                 <input type="checkbox" 
                                        :checked="selectedMonths.includes('{{ $monthKey }}')"
                                        @click.stop="toggleMonth('{{ $monthKey }}')"
@@ -145,7 +145,7 @@
                             <a href="{{ route('budgets.month', ['month' => $stats['month'], 'year' => $stats['year']]) }}" 
                                :class="selectionMode ? 'pointer-events-none' : ''"
                                class="block bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition-shadow duration-200">
-                                <div class="p-6" :class="selectionMode ? 'pl-20 pt-10' : ''">
+                                <div class="p-6" :class="selectionMode ? 'pl-20 pt-12' : ''">
                                 <!-- Month Header -->
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
