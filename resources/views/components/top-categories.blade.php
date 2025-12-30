@@ -1,10 +1,10 @@
-@props(['monthBudgets'])
+@props(['monthBudgets', 'month', 'year'])
 
 <!-- Top 3 Spending Categories - Quick Overview -->
 <div class="bg-white rounded-xl shadow-lg p-6">
     <div class="flex justify-between items-center mb-5">
         <h3 class="text-xl font-semibold text-gray-900">Top Categories</h3>
-        <a href="{{ route('budgets.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+        <a href="{{ route('budgets.month', ['month' => $month, 'year' => $year]) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
             Manage →
         </a>
     </div>

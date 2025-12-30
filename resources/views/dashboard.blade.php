@@ -151,7 +151,7 @@
 
                 <!-- Top Categories - Secondary -->
                 <div class="lg:col-span-1">
-                    <x-top-categories :monthBudgets="$monthBudgets" />
+                    <x-top-categories :monthBudgets="$monthBudgets" :month="$selectedMonth" :year="$selectedYear" />
                 </div>
             </div>
             @endif
