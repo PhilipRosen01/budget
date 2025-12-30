@@ -22,6 +22,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" x-data="{
             selectionMode: false,
             selectedMonths: [],
+            init() {
+                console.log('Alpine.js initialized on budgets index page');
+            },
             toggleSelectionMode() {
                 this.selectionMode = !this.selectionMode;
                 if (!this.selectionMode) {
@@ -103,6 +106,14 @@
 
             <!-- Information Box -->
             <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded">
+                <!-- Debug: Alpine State Display -->
+                <div class="mb-2 text-xs text-gray-600" x-show="true">
+                    <span>Alpine.js Active | Selection Mode: </span>
+                    <span x-text="selectionMode ? 'ON' : 'OFF'" class="font-bold"></span>
+                    <span> | Selected: </span>
+                    <span x-text="selectedMonths.length" class="font-bold"></span>
+                </div>
+                
                 <div class="flex justify-between items-start">
                     <div class="flex">
                         <div class="flex-shrink-0">
