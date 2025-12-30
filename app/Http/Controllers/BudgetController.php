@@ -261,6 +261,41 @@ class BudgetController extends Controller
         }
     }
 
+    /**
+     * Bulk delete budgets by IDs
+     */
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:budgets,id',
+        ]);
+
+        $user = Auth::user();
+        $ids = $validated['ids'];
+
+        // Ensure all budgets belong to the authenticated user
+        $budgets = Budget::whereIn('id', $ids)
+            ->where('user_id', $user->id)
+            ->get();
+
+        if ($budgets->count() !== count($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'One or more budgets do not belong to you or do not exist.'
+            ], 403);
+        }
+
+        // Delete the budgets
+        Budget::whereIn('id', $ids)->delete();
+
+        return response()->json([
+            'success' => true,
+            'count' => count($ids),
+            'message' => count($ids) . ' budget(s) deleted successfully.'
+        ]);
+    }
+
 
     private function getAvailableMonths()
     {

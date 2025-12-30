@@ -1,4 +1,69 @@
 <x-app-layout>
+    <div x-data="{
+        selectionMode: false,
+        selectedBudgets: [],
+        
+        init() {
+            console.log('Alpine.js initialized on budgets month page');
+        },
+        
+        toggleSelectionMode() {
+            console.log('Toggle selection mode clicked');
+            this.selectionMode = !this.selectionMode;
+            console.log('Selection mode is now:', this.selectionMode);
+            if (!this.selectionMode) {
+                this.selectedBudgets = [];
+            }
+        },
+        
+        toggleBudget(id) {
+            const index = this.selectedBudgets.indexOf(id);
+            if (index > -1) {
+                this.selectedBudgets.splice(index, 1);
+            } else {
+                this.selectedBudgets.push(id);
+            }
+        },
+        
+        selectAll() {
+            const allIds = @js($budgets->pluck('id')->toArray());
+            this.selectedBudgets = [...allIds];
+        },
+        
+        deselectAll() {
+            this.selectedBudgets = [];
+        },
+        
+        deleteSelected() {
+            if (this.selectedBudgets.length === 0) {
+                alert('Please select at least one budget to delete.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete ' + this.selectedBudgets.length + ' budget(s)? This action cannot be undone.')) {
+                fetch('{{ route('budgets.bulk-delete') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ ids: this.selectedBudgets })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting budgets: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting budgets. Please try again.');
+                });
+            }
+        }
+    }">
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
@@ -38,6 +103,62 @@
                 </div>
             @endif
 
+            <!-- Select Button - Simple and Visible -->
+            @if($budgets->count() > 0)
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Manage Budgets</h3>
+                            <p class="text-sm text-gray-500">Select multiple budgets to delete them at once</p>
+                        </div>
+                        <button @click="toggleSelectionMode()" 
+                                type="button"
+                                class="inline-flex items-center px-6 py-3 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150"
+                                :class="selectionMode ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-500'">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            </svg>
+                            <span x-text="selectionMode ? 'Cancel Selection' : 'Select Budgets'">Select Budgets</span>
+                        </button>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Bulk Actions Bar (shown in selection mode) -->
+            <div x-show="selectionMode" 
+                 x-transition
+                 class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-medium text-gray-700">
+                            <span x-text="selectedBudgets.length"></span> budget(s) selected
+                        </span>
+                        <div class="flex gap-2">
+                            <button @click="selectAll()" 
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                Select All
+                            </button>
+                            <span class="text-gray-300">|</span>
+                            <button @click="deselectAll()" 
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                Deselect All
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <button @click="deleteSelected()" 
+                                :disabled="selectedBudgets.length === 0"
+                                :class="selectedBudgets.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'"
+                                class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Month Navigation -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
@@ -67,8 +188,25 @@
             @if($budgets->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($budgets as $budget)
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6">
+                        <div @click="selectionMode && toggleBudget({{ $budget->id }})"
+                             :class="{ 
+                                 'ring-4 ring-blue-500 ring-opacity-50': selectionMode && selectedBudgets.includes({{ $budget->id }}),
+                                 'cursor-pointer': selectionMode
+                             }"
+                             class="bg-white overflow-hidden shadow-sm sm:rounded-lg transition-all duration-200 relative">
+                            
+                            <!-- Selection Checkbox -->
+                            <div x-show="selectionMode" 
+                                 class="absolute top-6 left-8 z-20"
+                                 @click.stop>
+                                <input type="checkbox" 
+                                       :checked="selectedBudgets.includes({{ $budget->id }})"
+                                       @change="toggleBudget({{ $budget->id }})"
+                                       class="h-6 w-6 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+                            </div>
+
+                            <!-- Content wrapper with space for checkbox -->
+                            <div class="p-6 transition-all duration-200" :class="selectionMode ? 'pl-20' : ''">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $budget->name }}</h3>
@@ -89,13 +227,19 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('budgets.edit', $budget) }}" class="text-blue-600 hover:text-blue-900">
+                                    <div x-show="!selectionMode" class="flex space-x-2">
+                                        <a href="{{ route('budgets.edit', $budget) }}" 
+                                           class="text-blue-600 hover:text-blue-900"
+                                           @click.stop>
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                             </svg>
                                         </a>
-                                        <form action="{{ route('budgets.destroy', $budget) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this budget?')">
+                                        <form action="{{ route('budgets.destroy', $budget) }}" 
+                                              method="POST" 
+                                              class="inline" 
+                                              onsubmit="return confirm('Are you sure you want to delete this budget?')"
+                                              @click.stop>
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-900">
@@ -167,5 +311,6 @@
                 </div>
             @endif
         </div>
+    </div>
     </div>
 </x-app-layout>
