@@ -197,7 +197,7 @@
                             
                             <!-- Selection Checkbox -->
                             <div x-show="selectionMode" 
-                                 class="absolute top-6 left-8 z-20"
+                                 class="absolute top-8 left-10 z-20"
                                  @click.stop>
                                 <input type="checkbox" 
                                        :checked="selectedBudgets.includes({{ $budget->id }})"
@@ -206,7 +206,7 @@
                             </div>
 
                             <!-- Content wrapper with space for checkbox -->
-                            <div class="p-6 transition-all duration-200" :class="selectionMode ? 'pl-20' : ''">
+                            <div class="p-6 transition-all duration-200" :class="selectionMode ? 'pl-24' : ''">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-900">{{ $budget->name }}</h3>
