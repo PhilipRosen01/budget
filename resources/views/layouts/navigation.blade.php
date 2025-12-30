@@ -18,11 +18,17 @@
                         </svg>
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*') || request()->routeIs('budgets.*') || request()->routeIs('purchases.*')">
+                    <x-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*') || request()->routeIs('purchases.*')">
                         <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                         {{ __('Budgets') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*')">
+                        <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        {{ __('Templates') }}
                     </x-nav-link>
                     <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*') || request()->routeIs('purchase-goals.*')">
                         <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,8 +97,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*') || request()->routeIs('budgets.*') || request()->routeIs('purchases.*')">
+            <x-responsive-nav-link :href="route('budgets.index')" :active="request()->routeIs('budgets.*') || request()->routeIs('purchases.*')">
                 {{ __('Budgets') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('budget-templates.index')" :active="request()->routeIs('budget-templates.*')">
+                {{ __('Templates') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*') || request()->routeIs('purchase-goals.*')">
                 {{ __('Profile') }}
