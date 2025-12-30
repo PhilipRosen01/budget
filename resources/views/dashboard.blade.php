@@ -28,7 +28,7 @@
                         <select id="month-selector" 
                                 name="month-year" 
                                 onchange="this.form.submit()" 
-                                class="block w-full sm:w-56 px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm shadow-sm">
+                                class="block w-full sm:w-56 px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm shadow-sm">
                             @foreach($availableMonths as $month)
                                 <option value="{{ $month['value'] }}" {{ $month['value'] === $selectedValue ? 'selected' : '' }}>
                                     {{ $month['display'] }}
