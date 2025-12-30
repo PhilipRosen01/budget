@@ -1,4 +1,89 @@
 <x-app-layout>
+    <div x-data="{
+        selectionMode: false,
+        selectedTemplates: [],
+        
+        toggleSelectionMode() {
+            this.selectionMode = !this.selectionMode;
+            if (!this.selectionMode) {
+                this.selectedTemplates = [];
+            }
+        },
+        
+        toggleTemplate(id) {
+            const index = this.selectedTemplates.indexOf(id);
+            if (index > -1) {
+                this.selectedTemplates.splice(index, 1);
+            } else {
+                this.selectedTemplates.push(id);
+            }
+        },
+        
+        selectAll() {
+            const allIds = @js($templates->pluck('id')->toArray());
+            this.selectedTemplates = [...allIds];
+        },
+        
+        deselectAll() {
+            this.selectedTemplates = [];
+        },
+        
+        deleteSelected() {
+            if (this.selectedTemplates.length === 0) {
+                alert('Please select at least one template to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${this.selectedTemplates.length} template(s)? This will not delete existing monthly budgets.`)) {
+                fetch('{{ route('budget-templates.bulk-delete') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ ids: this.selectedTemplates })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting templates: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting templates. Please try again.');
+                });
+            }
+        },
+        
+        deleteAll() {
+            if (confirm('Are you sure you want to delete ALL templates? This action cannot be undone. This will not delete existing monthly budgets.')) {
+                const allIds = @js($templates->pluck('id')->toArray());
+                fetch('{{ route('budget-templates.bulk-delete') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ ids: allIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting templates: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting templates. Please try again.');
+                });
+            }
+        }
+    }">
     <x-slot name="header">
         <!-- Responsive Header Layout -->
         <div class="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
@@ -8,13 +93,25 @@
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">Define your standard monthly budgets</p>
             </div>
-            <a href="{{ route('budget-templates.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                <span class="hidden xs:inline">Create Template</span>
-                <span class="xs:hidden">Create</span>
-            </a>
+            <div class="flex flex-col sm:flex-row gap-2">
+                @if($templates->count() > 0)
+                    <button @click="toggleSelectionMode()" 
+                            :class="selectionMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <span x-text="selectionMode ? 'Cancel' : 'Select'"></span>
+                    </button>
+                @endif
+                <a href="{{ route('budget-templates.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span class="hidden xs:inline">Create Template</span>
+                    <span class="xs:hidden">Create</span>
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -95,11 +192,68 @@
                 </div>
             @endif
 
+            <!-- Bulk Actions Bar (shown in selection mode) -->
+            <div x-show="selectionMode" 
+                 x-transition
+                 class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-medium text-gray-700">
+                            <span x-text="selectedTemplates.length"></span> template(s) selected
+                        </span>
+                        <div class="flex gap-2">
+                            <button @click="selectAll()" 
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                Select All
+                            </button>
+                            <span class="text-gray-300">|</span>
+                            <button @click="deselectAll()" 
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                Deselect All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button @click="deleteSelected()" 
+                                :disabled="selectedTemplates.length === 0"
+                                :class="selectedTemplates.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'"
+                                class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Selected
+                        </button>
+                        <button @click="deleteAll()" 
+                                class="inline-flex items-center px-4 py-2 bg-red-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             @if($templates->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($templates as $template)
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div @click="selectionMode && toggleTemplate({{ $template->id }})"
+                             :class="{ 
+                                 'ring-4 ring-blue-500 ring-opacity-50': selectionMode && selectedTemplates.includes({{ $template->id }}),
+                                 'cursor-pointer': selectionMode
+                             }"
+                             class="bg-white overflow-hidden shadow-sm sm:rounded-lg transition-all duration-200">
                             <div class="p-6">
+                                <!-- Selection Checkbox -->
+                                <div x-show="selectionMode" 
+                                     class="absolute top-4 right-4 z-10"
+                                     @click.stop>
+                                    <input type="checkbox" 
+                                           :checked="selectedTemplates.includes({{ $template->id }})"
+                                           @change="toggleTemplate({{ $template->id }})"
+                                           class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                </div>
+
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <div class="flex items-center space-x-2">
@@ -117,13 +271,19 @@
                                             <p class="text-sm text-gray-500">{{ ucfirst(str_replace('_', ' ', $template->category)) }}</p>
                                         @endif
                                     </div>
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('budget-templates.edit', $template) }}" class="text-blue-600 hover:text-blue-900">
+                                    <div x-show="!selectionMode" class="flex space-x-2">
+                                        <a href="{{ route('budget-templates.edit', $template) }}" 
+                                           class="text-blue-600 hover:text-blue-900"
+                                           @click.stop>
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                             </svg>
                                         </a>
-                                        <form action="{{ route('budget-templates.destroy', $template) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this template? This will not delete existing monthly budgets.')">
+                                        <form action="{{ route('budget-templates.destroy', $template) }}" 
+                                              method="POST" 
+                                              class="inline" 
+                                              onsubmit="return confirm('Are you sure you want to delete this template? This will not delete existing monthly budgets.')"
+                                              @click.stop>
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-900">
@@ -312,4 +472,5 @@
             });
         }
     </script>
+    </div>
 </x-app-layout>

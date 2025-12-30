@@ -61,6 +61,8 @@ Route::middleware(['auth', 'onboarding.check'])->group(function () {
     
     // Budget template management routes
     Route::resource('budget-templates', BudgetTemplateController::class);
+    Route::post('/budget-templates/bulk-delete', [BudgetTemplateController::class, 'bulkDelete'])
+        ->name('budget-templates.bulk-delete');
     Route::post('/budget-templates/generate-next-month', [BudgetTemplateController::class, 'generateNextMonth'])
         ->name('budget-templates.generate-next-month');
     Route::post('/budget-templates/generate-current-month', [BudgetTemplateController::class, 'generateCurrentMonth'])

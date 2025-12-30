@@ -155,6 +155,44 @@ class BudgetTemplateController extends Controller
     }
 
     /**
+     * Bulk delete multiple budget templates
+     */
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|integer|exists:budget_templates,id',
+        ]);
+
+        $user = Auth::user();
+        
+        // Ensure all templates belong to the authenticated user
+        $templates = BudgetTemplate::whereIn('id', $validated['ids'])
+            ->where('user_id', $user->id)
+            ->get();
+
+        if ($templates->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No templates found or you do not have permission to delete them.'
+            ], 403);
+        }
+
+        $count = $templates->count();
+        
+        // Delete all selected templates
+        BudgetTemplate::whereIn('id', $validated['ids'])
+            ->where('user_id', $user->id)
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} template(s) deleted successfully!",
+            'count' => $count
+        ]);
+    }
+
+    /**
      * Generate budgets for next month
      */
     public function generateNextMonth()
