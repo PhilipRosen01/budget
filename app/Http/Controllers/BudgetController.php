@@ -296,6 +296,47 @@ class BudgetController extends Controller
         ]);
     }
 
+    /**
+     * Bulk delete budgets by months
+     */
+    public function bulkDeleteMonths(Request $request)
+    {
+        $validated = $request->validate([
+            'months' => 'required|array|min:1',
+            'months.*' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $months = $validated['months'];
+        
+        $totalDeleted = 0;
+
+        foreach ($months as $monthKey) {
+            // Parse the month-year format (e.g., "11-2025")
+            $parts = explode('-', $monthKey);
+            if (count($parts) !== 2) {
+                continue;
+            }
+            
+            $month = (int)$parts[0];
+            $year = (int)$parts[1];
+
+            // Delete all budgets for this user, month, and year
+            $deleted = Budget::where('user_id', $user->id)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->delete();
+            
+            $totalDeleted += $deleted;
+        }
+
+        return response()->json([
+            'success' => true,
+            'count' => $totalDeleted,
+            'message' => $totalDeleted . ' budget(s) deleted successfully from ' . count($months) . ' month(s).'
+        ]);
+    }
+
 
     private function getAvailableMonths()
     {

@@ -79,6 +79,8 @@ Route::middleware(['auth', 'onboarding.check'])->group(function () {
         ->name('budgets.destroy-month');
     Route::post('/budgets/bulk-delete', [BudgetController::class, 'bulkDelete'])
         ->name('budgets.bulk-delete');
+    Route::post('/budgets/bulk-delete-months', [BudgetController::class, 'bulkDeleteMonths'])
+        ->name('budgets.bulk-delete-months');
     Route::post('/budgets/create-from-templates', [BudgetController::class, 'createFromTemplates'])
         ->name('budgets.create-from-templates');
     Route::get('/budgets/select-templates', [BudgetController::class, 'selectTemplates'])

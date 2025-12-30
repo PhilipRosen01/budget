@@ -7,17 +7,94 @@
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">Overview of your monthly budgets and spending</p>
             </div>
-            <a href="{{ route('budget-templates.index') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                Manage Templates
-            </a>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('budget-templates.index') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Manage Templates
+                </a>
+            </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" x-data="{
+            selectionMode: false,
+            selectedMonths: [],
+            toggleSelectionMode() {
+                this.selectionMode = !this.selectionMode;
+                if (!this.selectionMode) {
+                    this.selectedMonths = [];
+                }
+            },
+            toggleMonth(monthKey) {
+                if (this.selectedMonths.includes(monthKey)) {
+                    this.selectedMonths = this.selectedMonths.filter(m => m !== monthKey);
+                } else {
+                    this.selectedMonths.push(monthKey);
+                }
+            },
+            selectAll() {
+                this.selectedMonths = @json(collect($monthlyStats)->map(function($stat) { return $stat['month'] . '-' . $stat['year']; })->toArray());
+            },
+            deselectAll() {
+                this.selectedMonths = [];
+            },
+            async deleteSelected() {
+                if (this.selectedMonths.length === 0) {
+                    alert('Please select at least one month to delete');
+                    return;
+                }
+                
+                if (!confirm(`Are you sure you want to delete ${this.selectedMonths.length} month(s) of budgets? This will delete all budgets within these months and cannot be undone.`)) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('{{ route('budgets.bulk-delete-months') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ months: this.selectedMonths })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting months: ' + (data.message || 'Unknown error'));
+                    }
+                } catch (error) {
+                    alert('Error deleting months: ' + error.message);
+                }
+            }
+        }">
+            <!-- Selection Mode Actions Bar -->
+            <div x-show="selectionMode" x-cloak class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                <div class="flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        <button @click="selectAll()" class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
+                            Select All
+                        </button>
+                        <button @click="deselectAll()" class="px-3 py-1.5 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition">
+                            Deselect All
+                        </button>
+                        <button @click="deleteSelected()" class="px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Selected
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <span x-text="selectedMonths.length"></span> month(s) selected
+                    </div>
+                </div>
+            </div>
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                     {{ session('success') }}
@@ -26,27 +103,49 @@
 
             <!-- Information Box -->
             <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800">Budget History Overview</h3>
-                        <div class="mt-2 text-sm text-blue-700">
-                            <p>This page shows your financial overview for each month. Click on any month card to view detailed budgets and track spending for that specific month.</p>
+                <div class="flex justify-between items-start">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">Budget History Overview</h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <p>This page shows your financial overview for each month. Click on any month card to view detailed budgets and track spending for that specific month.</p>
+                            </div>
                         </div>
                     </div>
+                    <button @click="toggleSelectionMode()" 
+                            class="ml-4 text-sm font-medium transition-colors"
+                            :class="selectionMode ? 'text-red-600 hover:text-red-700' : 'text-gray-600 hover:text-gray-700'">
+                        <span x-text="selectionMode ? 'Cancel' : 'Select'"></span>
+                    </button>
                 </div>
             </div>
 
             @if(count($monthlyStats) > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($monthlyStats as $stats)
-                        <a href="{{ route('budgets.month', ['month' => $stats['month'], 'year' => $stats['year']]) }}" 
-                           class="block bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition-shadow duration-200">
-                            <div class="p-6">
+                        @php
+                            $monthKey = $stats['month'] . '-' . $stats['year'];
+                        @endphp
+                        <div class="relative">
+                            <!-- Selection Checkbox -->
+                            <div x-show="selectionMode" 
+                                 x-cloak
+                                 class="absolute top-6 left-8 z-10 p-2 bg-white rounded-lg shadow-sm">
+                                <input type="checkbox" 
+                                       :checked="selectedMonths.includes('{{ $monthKey }}')"
+                                       @click.stop="toggleMonth('{{ $monthKey }}')"
+                                       class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                            </div>
+                            
+                            <a href="{{ route('budgets.month', ['month' => $stats['month'], 'year' => $stats['year']]) }}" 
+                               :class="selectionMode ? 'pointer-events-none' : ''"
+                               class="block bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition-shadow duration-200">
+                                <div class="p-6" :class="selectionMode ? 'pl-20 pt-10' : ''">
                                 <!-- Month Header -->
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
@@ -143,6 +242,7 @@
                                 </div>
                             </div>
                         </a>
+                        </div>
                     @endforeach
                 </div>
             @else
