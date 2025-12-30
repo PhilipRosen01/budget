@@ -261,10 +261,11 @@
                                  'cursor-pointer': selectionMode
                              }"
                              class="bg-white overflow-hidden shadow-sm sm:rounded-lg transition-all duration-200 relative">
-                            <div class="p-6">
+                            <!-- Wrapper for all content with conditional padding for checkbox -->
+                            <div class="p-6" :class="selectionMode ? 'pl-14' : ''">
                                 <!-- Selection Checkbox - Positioned at top-left to avoid title overlap -->
                                 <div x-show="selectionMode" 
-                                     class="absolute top-4 left-4 z-10"
+                                     class="absolute top-6 left-4 z-10"
                                      @click.stop>
                                     <input type="checkbox" 
                                            :checked="selectedTemplates.includes({{ $template->id }})"
@@ -272,7 +273,7 @@
                                            class="h-6 w-6 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
                                 </div>
 
-                                <div class="flex justify-between items-start mb-4" :class="selectionMode ? 'ml-10' : ''">
+                                <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <div class="flex items-center space-x-2">
                                             <h3 class="text-lg font-semibold text-gray-900">{{ $template->name }}</h3>
