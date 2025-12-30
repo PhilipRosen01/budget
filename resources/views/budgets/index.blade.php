@@ -8,6 +8,11 @@
                 <p class="text-sm text-gray-500 mt-1">Overview of your monthly budgets and spending</p>
             </div>
             <div class="flex items-center space-x-3">
+                <!-- ALPINE.JS TEST - Should show "Alpine Works!" if Alpine is loaded -->
+                <div x-data="{ test: 'Alpine Works!' }" class="bg-green-500 text-white px-4 py-2 rounded font-bold">
+                    <span x-text="test"></span>
+                </div>
+                
                 <a href="{{ route('budget-templates.index') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -104,6 +109,14 @@
                     {{ session('success') }}
                 </div>
             @endif
+
+            <!-- STATIC TEST BUTTON - Should ALWAYS be visible -->
+            <div class="bg-red-500 text-white p-6 rounded-lg mb-6 text-center">
+                <h2 class="text-2xl font-bold mb-2">STATIC TEST - If you see this, the file is loading correctly</h2>
+                <button onclick="alert('Button works!')" class="bg-white text-red-500 px-6 py-3 rounded-lg font-bold text-lg">
+                    CLICK ME - Static Test Button
+                </button>
+            </div>
 
             <!-- Information Box -->
             <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded">
