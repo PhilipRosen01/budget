@@ -273,7 +273,7 @@
                             </div>
 
                             <!-- Content wrapper with space for checkbox -->
-                            <div :class="selectionMode ? 'pl-16 pr-6 py-6' : 'p-6'" class="transition-all duration-200">
+                            <div class="p-6 transition-all duration-200" :class="selectionMode ? 'pl-16' : ''">
                                 <div class="flex justify-between items-start mb-4">
                                     <div>
                                         <div class="flex items-center space-x-2">
