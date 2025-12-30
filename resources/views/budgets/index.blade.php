@@ -77,23 +77,24 @@
             }
         }">
             <!-- Selection Mode Actions Bar -->
-            <div x-show="selectionMode" x-cloak class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div x-show="selectionMode" class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg shadow-lg p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Bulk Actions</h3>
                 <div class="flex flex-wrap gap-3 items-center justify-between">
                     <div class="flex flex-wrap gap-2">
-                        <button @click="selectAll()" class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
+                        <button @click="selectAll()" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition shadow">
                             Select All
                         </button>
-                        <button @click="deselectAll()" class="px-3 py-1.5 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition">
+                        <button @click="deselectAll()" class="px-4 py-2 bg-gray-600 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition shadow">
                             Deselect All
                         </button>
-                        <button @click="deleteSelected()" class="px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
+                        <button @click="deleteSelected()" class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition shadow">
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                             Delete Selected
                         </button>
                     </div>
-                    <div class="text-sm text-gray-600">
+                    <div class="text-sm font-semibold text-gray-700 bg-white px-4 py-2 rounded-lg shadow">
                         <span x-text="selectedMonths.length"></span> month(s) selected
                     </div>
                 </div>
@@ -129,9 +130,9 @@
                         </div>
                     </div>
                     <button @click="toggleSelectionMode()" 
-                            class="ml-4 px-3 py-1.5 text-sm font-medium rounded transition-colors whitespace-nowrap"
-                            :class="selectionMode ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'">
-                        <span x-text="selectionMode ? 'Cancel' : 'Select'"></span>
+                            class="ml-4 px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-sm border-2"
+                            :class="selectionMode ? 'bg-red-500 text-white border-red-600 hover:bg-red-600' : 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600'">
+                        <span x-text="selectionMode ? 'Cancel Selection' : 'Select Months'"></span>
                     </button>
                 </div>
             </div>
@@ -145,12 +146,11 @@
                         <div class="relative" x-data="{}">
                             <!-- Selection Checkbox -->
                             <div x-show="selectionMode" 
-                                 x-cloak
-                                 class="absolute top-6 left-6 z-10 p-2 bg-white rounded-lg shadow-sm">
+                                 class="absolute top-6 left-6 z-10 p-2 bg-white rounded-lg shadow-md border-2 border-blue-300">
                                 <input type="checkbox" 
                                        :checked="selectedMonths.includes('{{ $monthKey }}')"
                                        @click.stop="toggleMonth('{{ $monthKey }}')"
-                                       class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                                       class="w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
                             </div>
                             
                             <a href="{{ route('budgets.month', ['month' => $stats['month'], 'year' => $stats['year']]) }}" 
