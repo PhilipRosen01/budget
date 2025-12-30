@@ -14,7 +14,7 @@
             // Get top 3 categories by spending
             $topBudgets = $monthBudgets->sortByDesc(function($budget) {
                 return $budget->totalSpent();
-            })->take(3);
+            })->take(3)->values(); // Reset array keys to 0, 1, 2
         @endphp
         
         <div class="space-y-5">
