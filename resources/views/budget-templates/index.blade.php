@@ -34,12 +34,12 @@
                 return;
             }
             
-            if (confirm(`Are you sure you want to delete ${this.selectedTemplates.length} template(s)? This will not delete existing monthly budgets.`)) {
+            if (confirm('Are you sure you want to delete ' + this.selectedTemplates.length + ' template(s)? This will not delete existing monthly budgets.')) {
                 fetch('{{ route('budget-templates.bulk-delete') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
                     },
                     body: JSON.stringify({ ids: this.selectedTemplates })
                 })
@@ -65,7 +65,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
                     },
                     body: JSON.stringify({ ids: allIds })
                 })
