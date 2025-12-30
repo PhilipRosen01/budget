@@ -264,7 +264,7 @@
                             
                             <!-- Selection Checkbox - Fixed position outside content flow -->
                             <div x-show="selectionMode" 
-                                 class="absolute top-4 left-4 z-20"
+                                 class="absolute top-6 left-6 z-20"
                                  @click.stop>
                                 <input type="checkbox" 
                                        :checked="selectedTemplates.includes({{ $template->id }})"
