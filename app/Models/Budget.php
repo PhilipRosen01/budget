@@ -98,8 +98,8 @@ class Budget extends Model
         }
 
         // Otherwise, provide smart defaults based on category/name
-        $name = strtolower($this->name ?? '');
-        $category = strtolower($this->category ?? '');
+        $name = strtolower($this->attributes['name'] ?? '');
+        $category = strtolower($this->attributes['category'] ?? '');
 
         // Category-based defaults
         $categoryIcons = [

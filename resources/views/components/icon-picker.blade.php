@@ -36,6 +36,7 @@
         { emoji: '📦', label: 'Miscellaneous' }
     ]
 }" 
+@click.away="open = false"
 class="relative">
     <!-- Selected Icon Display -->
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -45,7 +46,6 @@ class="relative">
     <button 
         type="button"
         @click="open = !open"
-        @click.away="open = false"
         class="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:border-indigo-500 dark:hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
     >
         <span class="flex items-center gap-3">
