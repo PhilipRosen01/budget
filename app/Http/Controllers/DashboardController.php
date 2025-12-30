@@ -122,7 +122,7 @@ class DashboardController extends Controller
         // Get active templates for view
         $activeTemplates = $user->activeBudgetTemplates;
         
-        $selectedMonth = $selectedDate->format('F Y');
+        $selectedMonthDisplay = $selectedDate->format('F Y');
         $selectedValue = $selectedDate->month . '-' . $selectedDate->year;
         
         // If the selected month doesn't exist in available months and isn't current month,
@@ -139,6 +139,6 @@ class DashboardController extends Controller
             session()->forget('just_deleted');
         }
         
-        return view('dashboard', compact('monthBudgets', 'recentPurchases', 'budgetStats', 'selectedMonth', 'availableMonths', 'selectedValue', 'isCurrentMonth', 'user', 'purchaseGoals', 'hasAnyBudgets', 'activeTemplates'));
+        return view('dashboard', compact('monthBudgets', 'recentPurchases', 'budgetStats', 'selectedMonthDisplay', 'selectedMonth', 'selectedYear', 'availableMonths', 'selectedValue', 'isCurrentMonth', 'user', 'purchaseGoals', 'hasAnyBudgets', 'activeTemplates'));
     }
 }

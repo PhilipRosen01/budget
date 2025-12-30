@@ -3,8 +3,15 @@
         selectionMode: false,
         selectedTemplates: [],
         
+        init() {
+            console.log('Alpine.js initialized on templates page');
+            console.log('Templates count:', {{ $templates->count() }});
+        },
+        
         toggleSelectionMode() {
+            console.log('Toggle selection mode clicked');
             this.selectionMode = !this.selectionMode;
+            console.log('Selection mode is now:', this.selectionMode);
             if (!this.selectionMode) {
                 this.selectedTemplates = [];
             }
@@ -118,6 +125,27 @@
 
     <div class="py-6 sm:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Debug Panel (remove after testing) -->
+            <div class="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-6" x-data="{show: true}" x-show="show">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-yellow-800 mb-2">🔍 Debug Info (Select Button Visibility Test)</h4>
+                        <ul class="text-sm text-yellow-900 space-y-1">
+                            <li><strong>Templates Count:</strong> {{ $templates->count() }}</li>
+                            <li><strong>Alpine Loaded:</strong> <span x-text="'Yes - Alpine is working!'">Loading...</span></li>
+                            <li><strong>Selection Mode:</strong> <span x-text="selectionMode ? 'Active' : 'Inactive'">Checking...</span></li>
+                            <li><strong>Selected Templates:</strong> <span x-text="selectedTemplates.length">0</span></li>
+                            <li><strong>Button Condition (@if):</strong> {{ $templates->count() > 0 ? 'TRUE - Button should show' : 'FALSE - Button hidden' }}</li>
+                        </ul>
+                    </div>
+                    <button @click="show = false" class="text-yellow-600 hover:text-yellow-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     {{ session('success') }}

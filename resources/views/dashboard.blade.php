@@ -14,9 +14,9 @@
                     Budget Dashboard
                 </h2>
                 @if($isCurrentMonth)
-                    <p class="text-sm text-gray-500 mt-1">{{ $selectedMonth }} (Current Month)</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ $selectedMonthDisplay }} (Current Month)</p>
                 @else
-                    <p class="text-sm text-gray-500 mt-1">{{ $selectedMonth }}</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ $selectedMonthDisplay }}</p>
                 @endif
             </div>
             
@@ -87,7 +87,7 @@
                             Start tracking your spending in seconds. Create your budget categories and begin adding purchases right away.
                         </p>
                     @else
-                        <h3 class="text-2xl font-bold text-gray-900 mb-3">No Budget for {{ $selectedMonth }}</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">No Budget for {{ $selectedMonthDisplay }}</h3>
                         <p class="text-gray-600 mb-8">Set up your budget to start tracking spending this month.</p>
                     @endif
 
@@ -146,7 +146,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Recent Purchases - Primary Focus -->
                 <div class="lg:col-span-1">
-                    <x-recent-purchases :purchases="$recentPurchases" :selectedMonth="$selectedMonth" />
+                    <x-recent-purchases :purchases="$recentPurchases" :selectedMonth="$selectedMonthDisplay" />
                 </div>
 
                 <!-- Top Categories - Secondary -->
